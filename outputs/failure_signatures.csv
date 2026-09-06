@@ -1,0 +1,5 @@
+cluster_id,signature_label,n_dies,top_feature_1,top_feature_2,top_feature_3,top_feature_4,top_feature_5
+0,Block-Reading Signal Drift / Memory Array Shift,14,blk_mean (1.0515),sp_dist_to_fail (1.0213),blk_q75 (0.3625),blk_std (0.2724),sp_old_label (0.1666)
+1,Block-Reading Signal Drift / Memory Array Shift,11,blk_mean (1.1291),sp_dist_to_fail (1.0147),blk_q75 (0.1993),sp_old_label (0.1666),blk_std (0.1240)
+2,Defect Neighborhood Proximity & Spatial Clustering,373,sp_dist_to_fail (1.0251),blk_mean (0.3870),sp_old_label (0.1621),blk_q75 (0.1269),blk_std (0.1264)
+3,Defect Neighborhood Proximity & Spatial Clustering,17,sp_dist_to_fail (1.0639),blk_mean (0.3300),sp_old_label (0.1627),blk_q75 (0.1255),blk_std (0.1222)
