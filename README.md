@@ -25,7 +25,7 @@ This repository contains a complete, production-ready machine learning solution 
 
 An interactive Streamlit application is available for exploring the results, inspecting continuous 2D Gaussian wafer risk fields, and examining per-die SHAP diagnostics:
 
-- **Shareable Cloud Link**: `https://die-yield-prediction.streamlit.app/`
+- **Shareable Cloud Link**: [https://die-yield-prediction.streamlit.app/](https://die-yield-prediction.streamlit.app/)
 - **Local Launch**: `streamlit run dashboard/app.py`
 - **Read-Only Architecture**: The dashboard operates strictly as a fast, read-only presentation layer over the already-audited models and cached artifacts — no retraining or threshold re-tuning occurs inside the dashboard.
 

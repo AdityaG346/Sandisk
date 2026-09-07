@@ -9,6 +9,7 @@ streamlit run dashboard/app.py
 ```
 
 The application will launch on `http://localhost:8501`. It loads all precomputed models, probability fields, and evaluation benchmarks directly from `outputs/` without triggering retraining.
+A live cloud deployment is also available at: [https://die-yield-prediction.streamlit.app/](https://die-yield-prediction.streamlit.app/).
 
 ---
 
