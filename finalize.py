@@ -1,247 +1,199 @@
 """
 finalize.py
-------------
-Regenerate results_summary.md from saved models and outputs.
-All models, plots, and SHAP outputs were already produced by run_all.py.
-This script re-runs just the results writing step.
+-----------
+Generate the final predictions CSV for hackathon submission.
+
+Workflow:
+1. Loads holdout test data (input/test.csv) and production Model B checkpoint.
+2. Extracts and aligns parametric, spatial, sub-die block, and anomaly features.
+3. Scores every die in input/test.csv (all 39,351 dies, not just eligible ones).
+4. Applies competition eligibility logic:
+   - old_label == 1: predicted_label = 1 directly (trivially failed pre-test).
+   - old_label == 0: predicted_label = 1 if prob >= tuned_threshold else 0.
+5. Saves outputs/predictions.csv matching README.md format:
+   wafer_id,die_row,die_col,predicted_label
+6. Runs sanity checks on row counts, column names/types, and fail rates.
 """
+
+from __future__ import annotations
+
 import os
 os.environ["PYTHONUTF8"] = "1"
 
-import numpy as np
-import pandas as pd
 import joblib
 from pathlib import Path
+import numpy as np
+import pandas as pd
 
-from src.data_loader import load_train, load_test, wafer_level_split, get_feature_cols
+from src.data_loader import load_test, load_train, wafer_level_split, get_feature_cols
 from src.spatial_features import compute_spatial_features
 from src.block_features import compute_block_features_from_series, get_block_feature_cols
 from src.anomaly_features import DieAnomalyDetector, BlockAnomalyDetector
-from src.model_a import predict_model_a, get_feature_set_a
-from src.model_b import predict_model_b, get_feature_set_b
-from src.evaluation import evaluate, comparison_table, ablation_table
+from src.model_b import get_feature_set_b
 
-OUTPUT_DIR = "outputs"
 
-# ---- Reload everything that was saved ----
-print("Loading saved models...")
-model_a = joblib.load("outputs/model_a.pkl")
-meta_a  = joblib.load("outputs/model_a_meta.pkl")
-model_b = joblib.load("outputs/model_b.pkl")
-meta_b  = joblib.load("outputs/model_b_meta.pkl")
-thresh_a, feat_cols_a = meta_a["threshold"], meta_a["feat_cols"]
-thresh_b, feat_cols_b = meta_b["threshold"], meta_b["feat_cols"]
+def generate_submission_predictions(
+    test_csv_path: str = "input/test.csv",
+    output_csv_path: str = "outputs/predictions.csv",
+    cache_dir: str = "outputs/cache",
+    output_dir: str = "outputs",
+) -> pd.DataFrame:
+    """
+    Score test dies and write outputs/predictions.csv.
+    Returns the submission DataFrame.
+    """
+    print("=" * 65)
+    print("  GENERATING FINAL HACKATHON SUBMISSION PREDICTIONS")
+    print("=" * 65)
 
-print("Loading data...")
-train_df = load_train("input")
-test_df  = load_test("input")
+    # 1. Load Model B and its tuned threshold
+    model_path = Path(output_dir) / "model_b.pkl"
+    meta_path = Path(output_dir) / "model_b_meta.pkl"
+    if not model_path.exists() or not meta_path.exists():
+        raise FileNotFoundError(f"Missing Model B artifacts: {model_path} or {meta_path}")
 
-# Rebuild features for test set
-feat_cols = get_feature_cols(train_df)
+    print(f"\n[1/6] Loading Model B checkpoint from {model_path}...")
+    model_b = joblib.load(model_path)
+    meta_b = joblib.load(meta_path)
+    threshold_b = float(meta_b["threshold"])
+    feat_cols_b = meta_b["feat_cols"]
+    print(f"      Model B loaded successfully.")
+    print(f"      Feature count: {len(feat_cols_b)}")
+    print(f"      Tuned threshold: {threshold_b:.6f}")
 
-print("Computing test spatial features...")
-sp_test = compute_spatial_features(test_df)
+    # 2. Load test data
+    print(f"\n[2/6] Loading test dataset from {test_csv_path}...")
+    test_df = load_test(str(Path(test_csv_path).parent))
+    n_total = len(test_df)
+    n_wafers = test_df["wafer_id"].nunique()
+    n_old_fails = int((test_df["old_label"] == 1).sum())
+    n_eligible = int((test_df["old_label"] == 0).sum())
+    print(f"      Total test dies: {n_total:,} across {n_wafers} wafers")
+    print(f"      Pre-test failed dies (old_label=1): {n_old_fails:,} ({n_old_fails/n_total*100:.2f}%)")
+    print(f"      Eligible dies (old_label=0):        {n_eligible:,} ({n_eligible/n_total*100:.2f}%)")
 
-print("Computing test block features...")
-blk_test = compute_block_features_from_series(test_df["block_readings"])
-blk_cols = get_block_feature_cols()
-
-# Fit anomaly detectors on train (old_label=0 only)
-print("Fitting anomaly detectors on train...")
-die_anom = DieAnomalyDetector(n_estimators=200, contamination=0.05)
-die_anom.fit(train_df, feat_cols)
-die_anom_test = die_anom.score(test_df, feat_cols)
-
-blk_train_full = compute_block_features_from_series(train_df["block_readings"])
-blk_anom = BlockAnomalyDetector(n_estimators=200, contamination=0.05)
-blk_anom.fit(train_df, blk_train_full, blk_cols)
-blk_anom_test = blk_anom.score(blk_test, blk_cols)
-
-# ---- Test predictions ----
-print("\n--- Model A Test Evaluation ---")
-y_pred_a, y_prob_a = predict_model_a(model_a, test_df, sp_test, die_anom_test, feat_cols_a, thresh_a)
-test_metrics_a = evaluate(test_df, y_pred_a, y_prob_a, threshold=thresh_a, verbose=True)
-
-print("\n--- Model B Test Evaluation ---")
-y_pred_b, y_prob_b = predict_model_b(model_b, test_df, sp_test, die_anom_test,
-                                      blk_test, blk_anom_test, feat_cols_b, thresh_b)
-test_metrics_b = evaluate(test_df, y_pred_b, y_prob_b, threshold=thresh_b, verbose=True)
-
-# ---- Ablation results (from log) ----
-ablation_metrics = {
-    "Die only":              {"pr_auc": 0.0616, "fail_f1": 0.0999, "fail_recall": 0.1651, "fail_precision": 0.0716, "overall_accuracy": 0.9129},
-    "Die + Spatial":         {"pr_auc": 0.0587, "fail_f1": 0.0981, "fail_recall": 0.2099, "fail_precision": 0.0640, "overall_accuracy": 0.8870},
-    "Die + Block":           {"pr_auc": 0.0660, "fail_f1": 0.1015, "fail_recall": 0.1604, "fail_precision": 0.0742, "overall_accuracy": 0.9168},
-    "Die + Spatial + Block": {"pr_auc": 0.0545, "fail_f1": 0.0888, "fail_recall": 0.1922, "fail_precision": 0.0577, "overall_accuracy": 0.8845},
-}
-
-# ---- Comparison table ----
-print("\n--- Comparison Table ---")
-comp = comparison_table({
-    "Model A (Die+Spatial+DieAnom)": test_metrics_a,
-    "Model B (Model A + Block)":     test_metrics_b,
-})
-print(comp.to_string(index=False))
-comp.to_csv(f"{OUTPUT_DIR}/comparison_table.csv", index=False)
-
-print("\n--- Ablation Table ---")
-abl = ablation_table(ablation_metrics)
-print(abl.to_string(index=False))
-abl.to_csv(f"{OUTPUT_DIR}/ablation_table.csv", index=False)
-
-# ---- Per-die explanations (from log, preserved verbatim) ----
-die_explanations = [
-    "Die (2,25) on wafer W_F_0014: failure probability 17.9%\n"
-    "   SHAP group contributions -> die-params: 0.1503 | spatial: 0.0026 | block: 0.0000 | anomaly: 0.0019\n"
-    "   Main reasons:\n"
-    "   1) feature_245 = 3.63e+03 (SHAP up 0.0381)\n"
-    "   2) feature_3 = 0.133 (SHAP up 0.0381)\n"
-    "   3) feature_89 = 974 (SHAP up 0.0149)",
-
-    "Die (3,10) on wafer W_F_0014: failure probability 18.5%\n"
-    "   SHAP group contributions -> die-params: 0.1141 | spatial: 0.0022 | block: 0.0000 | anomaly: 0.0620\n"
-    "   Main reasons:\n"
-    "   1) die_anomaly_score = 0.445 (SHAP up 0.0620)\n"
-    "   2) feature_284 = 0.183 (SHAP up 0.0189)\n"
-    "   3) feature_100 = 28.9 (SHAP up 0.0120)",
-
-    "Die (3,13) on wafer W_F_0014: failure probability 18.5%\n"
-    "   SHAP group contributions -> die-params: 0.1319 | spatial: 0.0017 | block: 0.0000 | anomaly: 0.0430\n"
-    "   Main reasons:\n"
-    "   1) die_anomaly_score = 0.46 (SHAP up 0.0430)\n"
-    "   2) feature_460 = -28.8 (SHAP up 0.0422)\n"
-    "   3) feature_342 = 1.86 (SHAP up 0.0103)",
-
-    "Die (3,22) on wafer W_F_0014: failure probability 17.9%\n"
-    "   SHAP group contributions -> die-params: 0.1352 | spatial: 0.0019 | block: 0.0000 | anomaly: 0.0044\n"
-    "   Main reasons:\n"
-    "   1) feature_245 = 3.46e+03 (SHAP up 0.0366)\n"
-    "   2) feature_3 = 0.132 (SHAP up 0.0215)\n"
-    "   3) feature_89 = 897 (SHAP up 0.0147)",
-
-    "Die (3,29) on wafer W_F_0014: failure probability 18.0%\n"
-    "   SHAP group contributions -> die-params: 0.1198 | spatial: 0.0027 | block: 0.0000 | anomaly: 0.0526\n"
-    "   Main reasons:\n"
-    "   1) die_anomaly_score = 0.442 (SHAP up 0.0526)\n"
-    "   2) feature_285 = 392 (SHAP up 0.0328)\n"
-    "   3) feature_286 = 28.7 (SHAP up 0.0197)",
-]
-
-# ---- Write results_summary.md ----
-def write_results_summary(test_metrics_a, test_metrics_b, comp_df, abl_df,
-                           die_explanations, train_df):
-    out = Path(OUTPUT_DIR)
-    lines = []
-
-    lines.append("# Die Yield Prediction -- Results Summary\n")
-
-    lines.append("## Step 1 -- Data Generation Verification\n")
-    lines.append("| Item | Config Target | Actual |")
-    lines.append("|------|--------------|--------|")
-    lines.append("| train rows | ~100K-200K | 173,099 |")
-    lines.append("| train wafers | 160 | 160 |")
-    lines.append("| test wafers | 40 | 40 |")
-    lines.append("| parametric features | 500 | 500 |")
-    lines.append("| feature scale ratio | multi-order | 49,033x |")
-    n_old = train_df["old_label"].sum()
-    n_t = len(train_df)
-    el = train_df[train_df["old_label"]==0]
-    n_new = el["label"].sum()
-    lines.append(f"| old_label=1 fail rate | ~3% | {n_old/n_t*100:.2f}% |")
-    lines.append(f"| new fail rate (eligible) | ~2% | {n_new/len(el)*100:.2f}% |")
-    lines.append(f"| overall fail rate (label) | ~5% | {train_df['label'].mean()*100:.2f}% |")
-    lines.append("\n> **MISMATCH FLAGGED**: overall fail rate is 14.78% vs config target of ~5%.")
-    lines.append("> Root cause: the WM-811K labeled-failure wafers selected for this seed have higher")
-    lines.append("> internal fail rates (~14%) than the assumed 12% in select_wafers(). The new-fail")
-    lines.append("> rate among eligible (old_label=0) dies is 4.23%, consistent with exponential(0.02).\n")
-
-    lines.append("## Step 2 -- EDA Findings\n")
-    lines.append("**Spatial predictiveness (new fail rate by zone):**")
-    lines.append("- Inner third (r < 0.33): 3.24% new-fail rate")
-    lines.append("- Middle third: 4.43%")
-    lines.append("- Outer third (r > 0.67): 5.38%")
-    lines.append("- **Conclusion: radial position is modestly predictive (+65% fail rate at edge vs center)**\n")
-    lines.append("**Old-fail neighborhood density:**")
-    lines.append("- Low density (<5%): 4.11% new-fail rate")
-    lines.append("- High density (>=5%): 4.35% new-fail rate")
-    lines.append("- **Conclusion: neighborhood density adds marginal predictive value in this dataset**\n")
-    lines.append("**Block reading signal strength (FLAGGED -- subtle):**")
-    lines.append("- Pass dies: block mean=100.00, std~10.5 (smoothing kernel reduces effective std from 15 to 10.5)")
-    lines.append("- Fail dies: block mean~100.18 (shift of 4.5 units on 5% of blocks => average shift ~0.225 units)")
-    lines.append("- Fixed threshold [55,145] cannot detect this shift; empirical 3*std threshold is needed")
-    lines.append("- **This is the key difficulty: block signal is extremely sparse and weak**\n")
-
-    lines.append("## Step 3 -- Leakage Check\n")
-    lines.append("- **PASSED**: Spatial features computed identically with and without `label` column present.")
-    lines.append("- All spatial features derive exclusively from `old_label`, `die_row`, `die_col`, `wafer_id`.")
-    lines.append("- Unit test `test_no_leakage()` in `src/spatial_features.py` confirms this programmatically.\n")
-
-    lines.append("## Step 5 -- Threshold Selection\n")
-    lines.append(f"- **Model A**: threshold = {thresh_a:.4f}, chosen by maximizing Fail F1 on validation set")
-    lines.append(f"- **Model B**: threshold = {thresh_b:.4f}, same criterion")
-    lines.append("- Both models use class weighting (scale_pos_weight ~5.7) instead of oversampling\n")
-
-    lines.append("## Step 6 -- Model Comparison (TEST set, old_label=0 eligible dies only)\n")
-    lines.append(comp_df[["Model","pr_auc","fail_f1","fail_recall","fail_precision",
-                           "overall_accuracy"]].to_markdown(index=False))
-    lines.append("")
-    lines.append("**Absolute improvements (Model B vs Model A):**")
-    r = comp_df.iloc[1]
-    lines.append(f"- PR-AUC:         {r['pr_auc_delta']:+.4f} ({r['pr_auc_pct']:+.2f}%)")
-    lines.append(f"- Fail F1:        {r['fail_f1_delta']:+.4f} ({r['fail_f1_pct']:+.2f}%)")
-    lines.append(f"- Fail Recall:    {r['fail_recall_delta']:+.4f} ({r['fail_recall_pct']:+.2f}%)")
-    lines.append(f"- Fail Precision: {r['fail_precision_delta']:+.4f} ({r['fail_precision_pct']:+.2f}%)")
-    lines.append(f"- Accuracy:       {r['overall_accuracy_delta']:+.4f} ({r['overall_accuracy_pct']:+.2f}%)\n")
-
-    lines.append("## Ablation Table (VALIDATION set)\n")
-    lines.append(abl_df.to_markdown(index=False))
-    lines.append("")
-
-    lines.append("## Step 7 -- Per-die Explanations (Model B, 5 examples)\n")
-    for expl in die_explanations:
-        lines.append("```")
-        lines.append(expl)
-        lines.append("```")
-        lines.append("")
-
-    lines.append("## Conclusion\n")
-    delta_f1  = test_metrics_b["fail_f1"]  - test_metrics_a["fail_f1"]
-    delta_auc = test_metrics_b["pr_auc"]   - test_metrics_a["pr_auc"]
-    delta_rec = test_metrics_b["fail_recall"] - test_metrics_a["fail_recall"]
-
-    lines.append(f"**Block features change vs Model A (on TEST eligible dies):**")
-    lines.append(f"- Fail F1: {delta_f1:+.4f}  ({delta_f1/max(test_metrics_a['fail_f1'],1e-9)*100:+.1f}%)")
-    lines.append(f"- PR-AUC:  {delta_auc:+.4f}")
-    lines.append(f"- Fail Recall: {delta_rec:+.4f}")
-    lines.append("")
-    if delta_f1 > 0.005:
-        verdict = "Block-level information provides **meaningful additional predictive power** beyond die-level + spatial features."
-    elif delta_f1 > 0:
-        verdict = ("Block-level information provides only **marginal improvement** (+{:.1f}% Fail F1). "
-                   "The extremely sparse, weak block signal (4.5-unit shift on 5% of blocks, "
-                   "smoothed to ~0.43 actual sigma) is partially captured by aggregate stats "
-                   "(blk_mean, blk_frac_anom_mad) but SHAP contributions are near zero. "
-                   "Block features add no meaningfully separable signal beyond die parametric features.").format(
-                       delta_f1/max(test_metrics_a['fail_f1'],1e-9)*100)
+    # 3. Load or compute spatial and block features
+    print("\n[3/6] Preparing feature matrices...")
+    sp_test_path = Path(cache_dir) / "sp_test.parquet"
+    if sp_test_path.exists():
+        print(f"      Loading spatial features from {sp_test_path}...")
+        sp_test = pd.read_parquet(sp_test_path)
     else:
-        verdict = ("Block-level information **does NOT improve** predictive power. "
-                   "The block fail shift of 4.5 units on 5% of blocks is too small relative to "
-                   "the noise floor to provide separable aggregate features beyond die parametric data.")
+        print("      Computing test spatial features from scratch...")
+        sp_test = compute_spatial_features(test_df)
 
-    lines.append(f"> **Verdict**: {verdict}")
-    lines.append("")
-    lines.append("**Why performance is generally low (Fail F1 ~0.12):**")
-    lines.append("1. 65% of fails are 'marginal' (nearly indistinguishable from passes by design)")
-    lines.append("2. Block signal is too weak to detect at individual-die level")
-    lines.append("3. Spatial predictors are modest (neighborhood density effect: +0.24pp only)")
-    lines.append("4. The die anomaly score (Isolation Forest) is the strongest single engineered feature")
+    blk_test_path = Path(cache_dir) / "blk_test.parquet"
+    if blk_test_path.exists():
+        print(f"      Loading block features from {blk_test_path}...")
+        blk_test = pd.read_parquet(blk_test_path)
+    else:
+        print("      Computing test block features from raw block_readings...")
+        blk_test = compute_block_features_from_series(test_df["block_readings"])
 
-    summary = "\n".join(lines)
-    p = out / "results_summary.md"
-    p.write_text(summary, encoding="utf-8")
-    print(f"\nResults summary written: {p}")
+    # Fit anomaly detectors on healthy training dies (seed=42)
+    print("      Fitting anomaly detectors on healthy training dies (old_label=0)...")
+    train_df = load_train(str(Path(test_csv_path).parent))
+    tr_df, _ = wafer_level_split(train_df, val_fraction=0.2, seed=42)
+    feat_cols = get_feature_cols(test_df)
+    blk_cols = get_block_feature_cols()
+
+    blk_tr_path = Path(cache_dir) / "blk_tr.parquet"
+    if blk_tr_path.exists():
+        blk_tr = pd.read_parquet(blk_tr_path)
+    else:
+        blk_tr = compute_block_features_from_series(tr_df["block_readings"])
+
+    die_anom = DieAnomalyDetector(n_estimators=100, contamination=0.05)
+    die_anom.fit(tr_df, feat_cols)
+    die_anom_test = die_anom.score(test_df, feat_cols)
+
+    blk_anom = BlockAnomalyDetector(n_estimators=100, contamination=0.05)
+    blk_anom.fit(tr_df, blk_tr, blk_cols)
+    blk_anom_test = blk_anom.score(blk_test, blk_cols)
+
+    # Assemble Model B feature matrix
+    X_test_b, _ = get_feature_set_b(test_df, sp_test, die_anom_test, blk_test, blk_anom_test)
+
+    # 4. Predict probabilities for all dies
+    print("\n[4/6] Scoring all dies through Model B...")
+    y_prob_b = model_b.predict_proba(X_test_b[feat_cols_b].values)[:, 1]
+
+    # 5. Apply eligibility assignment rules
+    print("\n[5/6] Applying competition label assignment rules...")
+    predicted_label = np.zeros(n_total, dtype=np.int64)
+
+    eligible_mask = (test_df["old_label"].values == 0)
+    old_fail_mask = (test_df["old_label"].values == 1)
+
+    # Rule A: Eligible dies use tuned threshold
+    predicted_label[eligible_mask] = (y_prob_b[eligible_mask] >= threshold_b).astype(np.int64)
+
+    # Rule B: Pre-test failed dies trivially remain failed
+    predicted_label[old_fail_mask] = 1
+
+    # Assemble final submission DataFrame
+    pred_df = pd.DataFrame({
+        "wafer_id": test_df["wafer_id"].astype(str),
+        "die_row": test_df["die_row"].astype(np.int64),
+        "die_col": test_df["die_col"].astype(np.int64),
+        "predicted_label": predicted_label,
+    })
+
+    # Save to disk
+    out_path = Path(output_csv_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    pred_df.to_csv(out_path, index=False)
+    print(f"      Saved predictions CSV to: {out_path}")
+
+    # 6. Sanity checks and validation
+    print("\n[6/6] Running automated sanity checks on predictions file...")
+    # Check A: Row count
+    assert len(pred_df) == 39351, f"Expected 39,351 rows, got {len(pred_df)}"
+    print(f"      [PASS] Row count matches input exactly: {len(pred_df):,} rows")
+
+    # Check B: Columns and order
+    expected_cols = ["wafer_id", "die_row", "die_col", "predicted_label"]
+    assert list(pred_df.columns) == expected_cols, f"Columns mismatch: {list(pred_df.columns)} vs {expected_cols}"
+    print(f"      [PASS] Column names and order match specification: {expected_cols}")
+
+    # Check C: Null values
+    assert not pred_df.isnull().any().any(), "Found null/NaN values in predictions!"
+    print("      [PASS] Zero null/NaN values detected")
+
+    # Check D: Pre-test fails all predicted as 1
+    assert (pred_df.loc[old_fail_mask, "predicted_label"] == 1).all(), "Some pre-test failed dies have predicted_label != 1!"
+    print(f"      [PASS] All {n_old_fails:,} pre-test failed dies (old_label=1) set to predicted_label=1")
+
+    # Check E: Label set
+    unique_labels = set(pred_df["predicted_label"].unique())
+    assert unique_labels.issubset({0, 1}), f"Unexpected labels found: {unique_labels}"
+    print(f"      [PASS] Predicted labels are binary: {sorted(list(unique_labels))}")
+
+    # Check F: Fail rates
+    total_fails = int(pred_df["predicted_label"].sum())
+    total_fail_rate = total_fails / n_total * 100
+    eligible_fails = int(pred_df.loc[eligible_mask, "predicted_label"].sum())
+    eligible_fail_rate = eligible_fails / n_eligible * 100
+
+    print("\n" + "=" * 65)
+    print("  FINAL PREDICTION SUMMARY & METRICS")
+    print("=" * 65)
+    print(f"  Model Selected:               Model B (Die + Spatial + Block + Anomaly)")
+    print(f"  Decision Threshold:           {threshold_b:.6f}")
+    print(f"  Total Dies Evaluated:         {n_total:,}")
+    print(f"  Pre-test Failed Dies:         {n_old_fails:,} (100.00% predicted fail)")
+    print(f"  Eligible Dies (old_label=0):  {n_eligible:,}")
+    print(f"  Eligible Predicted Fails:     {eligible_fails:,} ({eligible_fail_rate:.2f}% of eligible)")
+    print(f"  Total Predicted Fails:        {total_fails:,}")
+    print(f"  Final Overall Fail Rate:      {total_fail_rate:.4f}% ({total_fails:,} / {n_total:,})")
+    print("=" * 65)
+
+    assert 10.0 < total_fail_rate < 30.0, f"Overall fail rate {total_fail_rate:.2f}% is outside plausible range [10%, 30%]!"
+    assert 0.5 < eligible_fail_rate < 10.0, f"Eligible fail rate {eligible_fail_rate:.2f}% is outside plausible range [0.5%, 10%]!"
+    print("\n[SUCCESS] Final fail rate is verified in a healthy, plausible range!")
+
+    return pred_df
 
 
-write_results_summary(test_metrics_a, test_metrics_b, comp, abl,
-                      die_explanations, train_df)
-print("\nDone.")
+if __name__ == "__main__":
+    generate_submission_predictions()

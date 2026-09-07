@@ -21,6 +21,23 @@ This repository contains a complete, production-ready machine learning solution 
 
 ---
 
+## Live Interactive Dashboard
+
+An interactive Streamlit application is available for exploring the results, inspecting continuous 2D Gaussian wafer risk fields, and examining per-die SHAP diagnostics:
+
+- **Shareable Cloud Link**: `[link after deployment]`
+- **Local Launch**: `streamlit run dashboard/app.py`
+- **Read-Only Architecture**: The dashboard operates strictly as a fast, read-only presentation layer over the already-audited models and cached artifacts — no retraining or threshold re-tuning occurs inside the dashboard.
+
+### 5-Line Live Presentation Demo Script
+1. **Overview & Wafer Risk Field**: Open the dashboard with default wafer `W_F_0014` selected, observe the 4-panel view comparing the binary pre-test map to the continuous 2D Gaussian risk field, and highlight the prominent cyan hotspot contour encircling the outer defect cluster.
+2. **Side-by-Side Model Comparison**: Switch the sidebar toggle to *Side-by-side Comparison* to show how Model B's sub-die block readings sharpen probability separation along defect boundaries compared to Model A's spatial-only field.
+3. **Spatial Cluster Die Inspection**: In the Die Selector, inspect benchmark Die `(40, 18)` on `W_F_0014` (90.5% fail probability); note that `sp_dist_to_fail` and `blk_mean` dominate the SHAP attribution, classifying it into *Cluster 2 (Defect Neighborhood Proximity)*.
+4. **Sub-Die Block Signal Profile**: Scroll down to the *Sub-Die Block Signal Profile* to reveal the 2,000-reading sequential strip plot for Die `(40, 18)` with anomalous readings (>2×MAD from median, matching `src/block_features.py`) highlighted in red (360 anomalous blocks, 18.0%), clearly noting the index-position limitation.
+5. **Boundary Sensitivity & Benchmark Audit**: Select wafer `W_F_0016`, Die `(21, 12)` to demonstrate the marginal threshold case (52.1% probability) where normalizing `blk_mean` drops failure risk to 18.3% (crossing below the 0.518 threshold into Pass), concluding with the bottom audit table proving block features deliver statistically significant PR-AUC gains (+0.034, p < 0.001) while F1 remains constrained by marginal defect overlap.
+
+---
+
 ## Input Structure
 
 Files are generated in `input/` directory:
@@ -78,6 +95,7 @@ W_F_0001,5,13,1
 
 ## Repository Structure
 - **`src/`**: Modular Python library containing data loaders, spatial and block feature engineering, anomaly detectors, Model A/B definitions, evaluation routines, and visualization tools.
+- **`dashboard/`**: Interactive Streamlit presentation application (`app.py`), cloud dependencies (`requirements.txt`), and live demo guide.
 - **`input/`**: Directory holding raw and generated dataset CSVs (`train.csv`, `test.csv`, and `validation.csv`).
 - **`outputs/`**: Final production model checkpoints (`model_a.pkl`, `model_b.pkl`), evaluation tables, exact SHAP statistics, wafer heatmaps, and comprehensive documentation.
 - **`archive/`**: Archived intermediate tuning scripts, experimental runs, and scratch files preserved for reproducibility.
@@ -103,4 +121,7 @@ python run_all.py --config config_local.yaml
 
 # 5. Generate submission predictions CSV
 python finalize.py
+
+# 6. Launch interactive Streamlit presentation dashboard
+streamlit run dashboard/app.py
 ```
