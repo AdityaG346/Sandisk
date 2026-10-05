@@ -199,7 +199,31 @@ def main():
     parser.add_argument("--config", default="config_local.yaml")
     parser.add_argument("--no-eda", action="store_true", help="Skip EDA plots")
     parser.add_argument("--no-shap", action="store_true", help="Skip SHAP (faster)")
+    parser.add_argument(
+        "--out-dir", default="outputs_runall",
+        help="Output directory (default: outputs_runall/). EXPERIMENTAL: this script uses "
+             "200-tree anomaly detectors and is NOT the official submission pipeline."
+    )
+    parser.add_argument(
+        "--overwrite-official", action="store_true",
+        help="Allow writing to outputs/ (danger: overwrites frozen artifacts)"
+    )
     args = parser.parse_args()
+
+    # Reassign output directories based on --out-dir
+    global OUTPUT_DIR, PLOTS_DIR, SHAP_DIR, MAPS_DIR
+    OUTPUT_DIR = args.out_dir
+    PLOTS_DIR = str(Path(OUTPUT_DIR) / "plots")
+    SHAP_DIR = str(Path(OUTPUT_DIR) / "shap")
+    MAPS_DIR = str(Path(OUTPUT_DIR) / "wafer_maps")
+
+    # Safety guard: refuse to write to outputs/ unless explicitly authorized
+    _OFFICIAL = str(Path("outputs").resolve())
+    if Path(OUTPUT_DIR).resolve() == Path(_OFFICIAL) and not args.overwrite_official:
+        print("[run_all] ERROR: Refusing to write to outputs/ without --overwrite-official.")
+        print("  NOTE: run_all.py is EXPERIMENTAL (200-tree detectors). Use --out-dir to "
+              "redirect to a safe directory (default: outputs_runall/).")
+        sys.exit(1)
 
     t0 = time.time()
     for d in [OUTPUT_DIR, PLOTS_DIR, SHAP_DIR, MAPS_DIR]:

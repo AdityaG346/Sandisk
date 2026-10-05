@@ -1,0 +1,49 @@
+{
+  "pr_auc_convention": "trapezoidal (sklearn average_precision_score)",
+  "test_set": {
+    "n_wafers": 40,
+    "n_eligible_dies": 32598,
+    "n_true_fails": 1380
+  },
+  "model_a": {
+    "model": "Model A",
+    "threshold": 0.5573578595317725,
+    "pr_auc": 0.5024849596464346,
+    "fail_f1": 0.5206786850477201,
+    "fail_precision": 0.9703557312252964,
+    "fail_recall": 0.35579710144927534,
+    "overall_accuracy": 0.9722682373151728,
+    "tp": 491,
+    "fp": 15,
+    "fn": 889,
+    "tn": 31203
+  },
+  "model_b": {
+    "model": "Model B",
+    "threshold": 0.5180267558528427,
+    "pr_auc": 0.5361941170812549,
+    "fail_f1": 0.522182559918409,
+    "fail_precision": 0.8812392426850258,
+    "fail_recall": 0.3710144927536232,
+    "overall_accuracy": 0.971255905270262,
+    "tp": 512,
+    "fp": 69,
+    "fn": 868,
+    "tn": 31149
+  },
+  "triage": {
+    "A_top2pct": 0.38115942028985506,
+    "B_top2pct": 0.38768115942028986,
+    "A_top5pct": 0.46159420289855074,
+    "B_top5pct": 0.4971014492753623,
+    "A_top10pct": 0.5565217391304348,
+    "B_top10pct": 0.6043478260869565
+  },
+  "known_good_bootstrap_b_minus_a": {
+    "pr_auc_delta": "+0.034",
+    "pr_auc_ci": "[+0.023, +0.043]",
+    "fail_f1_delta": "+0.001",
+    "fail_f1_ci": "[-0.008, +0.012]",
+    "note": "wafer-cluster bootstrap, 1000 iterations, 40 test wafers"
+  }
+}

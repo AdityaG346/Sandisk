@@ -20,3 +20,8 @@ env/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Repro and experimental output directories
+outputs_repro/
+outputs_runall/
+outputs_smoke/

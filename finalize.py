@@ -1,6 +1,8 @@
 """
 finalize.py
 -----------
+OFFICIAL SUBMISSION PATH: This script produced the committed predictions.csv.
+
 Generate the final predictions CSV for hackathon submission.
 
 Workflow:
@@ -13,6 +15,14 @@ Workflow:
 5. Saves outputs/predictions.csv matching README.md format:
    wafer_id,die_row,die_col,predicted_label
 6. Runs sanity checks on row counts, column names/types, and fail rates.
+7. Self-check: verifies new probabilities match outputs/cache/test_probs_b.npy
+   within max abs diff < 1e-4 (prints actual value for audit).
+
+To reproduce:
+    python finalize.py
+
+Do NOT modify this script's logic. For experimental runs, use train_final.py
+or run_all.py with --out-dir pointing to a safe directory.
 """
 
 from __future__ import annotations
@@ -117,6 +127,20 @@ def generate_submission_predictions(
     # 4. Predict probabilities for all dies
     print("\n[4/6] Scoring all dies through Model B...")
     y_prob_b = model_b.predict_proba(X_test_b[feat_cols_b].values)[:, 1]
+
+    # Self-check: compare against committed cached probabilities
+    _cache_prob_path = Path(cache_dir) / "test_probs_b.npy"
+    if _cache_prob_path.exists():
+        _cached = np.load(_cache_prob_path)
+        _max_diff = float(np.max(np.abs(y_prob_b - _cached)))
+        print(f"      [self-check] Max abs diff vs cached test_probs_b.npy: {_max_diff:.2e}")
+        if _max_diff >= 1e-4:
+            print(f"      [WARNING] Self-check FAILED: max diff {_max_diff:.2e} >= 1e-4")
+            print("      This may indicate the anomaly detectors produced different scores.")
+        else:
+            print("      [self-check] PASS (max diff < 1e-4)")
+    else:
+        print(f"      [self-check] Skipped (cache file not found: {_cache_prob_path})")
 
     # 5. Apply eligibility assignment rules
     print("\n[5/6] Applying competition label assignment rules...")

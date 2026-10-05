@@ -1,0 +1,23 @@
+{
+  "outputs/model_a.pkl": "ed9d72a38ca81196dfec92a231b7b3e1e3665869c62c18ed77203696b6c541fb",
+  "outputs/model_b.pkl": "02ab7c665bda792405e2ca9b4be2e0e46aa256e1b77edf06deb24a4e3d06757d",
+  "outputs/model_a_meta.pkl": "6d9e4efbe2a7af05a15fabcc5627ef10ed12d69bb50cd297b423220ccbe7341c",
+  "outputs/model_b_meta.pkl": "17fec3a5161ee5e076baf71a5e8a96bba4421bb685a46962ccc2d9346fc8709b",
+  "outputs/predictions.csv": "3f0d16b9cb2efe50bc86c497865c81bf7605db4719c3300f1dc04cfea7719425",
+  "outputs/comparison_table.csv": "f0c63fac92bdd300e8d2fe5e0371aa3a246de351e438b4c3bc4233a8ccc38f7a",
+  "outputs/per_die_explanations.md": "233a2c507df94b40405c7b6be6156ecca4b60e173383093e55a172da20503a43",
+  "outputs/cache/test_probs_a.npy": "dde3ec083bba5ef44ce8670d47cb45325d750ca27ee67ea4938e7669bc7b9c2c",
+  "outputs/cache/test_probs_b.npy": "eb5aa28f0a4a7ed7c9ae9ea7707f2199b7dc675ce95b6a376ea371bbd7782716",
+  "outputs/cache/blk_anom_test.npy": "4c611837753ba2bf68c2aaf20b844640d1c245b6f000f03d137f07bbcf397e0e",
+  "outputs/cache/blk_test.parquet": "5aa2f1795c6b494b006fa3c7b90cdc61faf5773c35db8f0a5d179221a2d8eb26",
+  "outputs/cache/blk_tr.parquet": "99e7ddb7919d6779ecfa4b82a4e31ec89b28c59e6d88668c61a0faf77540621a",
+  "outputs/cache/blk_train_full.parquet": "bab96d79432ce6cd58c6f95415f7fdd31f4e4be90995c77cc39890ae444eede6",
+  "outputs/cache/blk_val.parquet": "188e2c69aa64276fb886ab31d1fe2a971400ce7e8615728ea474f542b5be0bb7",
+  "outputs/cache/die_anom_test.npy": "1036fb38fb394a5d6e1d488935e0ce6494d2e85569a6b6e112093a180913f110",
+  "outputs/cache/pass_medians_a.parquet": "5038cb7bf2f9abeecbc1282ac1c2af054ec2ca963b62f2ad4a7a226a558b4a11",
+  "outputs/cache/pass_medians_b.parquet": "a096691247bbd697764eb85feaec2edaa33a4ca391f7405bef98296870f63aec",
+  "outputs/cache/sp_test.parquet": "54308969d804dccb16393e260c9360a93d173fa71ed68958a45beb65fce68ff7",
+  "outputs/cache/sp_tr.parquet": "a641e3758aa0fa9c92b6ff4be9521d32e209d94dd7595e6ecb49a16cabc5af7e",
+  "outputs/cache/sp_val.parquet": "cce0e229e766ff4e39d0bcd3e50a0df2c15bb44c1c40c77241c54db94926f25a",
+  "outputs/cache/test_meta.parquet": "46390abe0d2b8c6bc23b92a68a691f071120bfffaa2fe9f7a324f49b07cc4c9e"
+}

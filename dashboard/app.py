@@ -454,6 +454,7 @@ def main():
     # Header
     st.markdown('<div class="main-header">Semiconductor Die Yield Prediction & Diagnostics</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Production Model Comparison, Wafer Risk Fields, and Per-Die Explainability</div>', unsafe_allow_html=True)
+    st.info("ℹ️ **Data Disclosure**: Real WM-811K wafer geometry and pre-test maps combined with synthetic die-level parametric measurements, synthetic sub-die block readings, and controlled new-failure labels.")
 
     # 1. Load data and models
     meta_df = load_test_metadata()
@@ -785,7 +786,7 @@ def main():
 
     st.markdown("""
     > **Key Architectural Takeaway**:  
-    > *Sub-die block readings provide a statistically verified improvement in continuous risk ranking and PR-AUC (+0.0343 to +0.0359, p = 1.33e-5), but do not provide a statistically defensible improvement in thresholded Fail F1 (+0.0008, 95% bootstrap CI contains zero) because 65% of post-burn-in defects are marginal cases whose electrical signatures overlap heavily with passing dies.*
+    > *Test set, 40 held-out wafers, wafer-cluster bootstrap: PR-AUC +0.034 [+0.023, +0.043]; Fail F1 +0.001 [-0.008, +0.012], not distinguishable from zero. Ablation = 5 repeated wafer splits (validation).*
     """)
 
     col_tbl1, col_tbl2 = st.columns([1, 1])
