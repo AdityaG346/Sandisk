@@ -395,7 +395,241 @@ st.markdown("""
     div[data-testid="stDataFrame"] {
         border: 1px solid var(--sd-border) !important;
         border-radius: var(--radius-md) !important;
-        overflow: hidden;
+        overflow: auto !important;
+    }
+
+    /* Responsive Comparison Tables Grid */
+    .sd-table-comparison-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: 18px;
+        width: 100%;
+        margin-top: 14px;
+        margin-bottom: 24px;
+        box-sizing: border-box;
+        align-items: start;
+    }
+
+    @media (max-width: 1100px) {
+        .sd-table-comparison-grid {
+            grid-template-columns: 1fr !important;
+            gap: 18px;
+        }
+    }
+
+    .sd-perf-card {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: border-color 160ms ease;
+    }
+
+    .sd-perf-card:hover {
+        border-color: #424954;
+    }
+
+    .sd-perf-card-header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(48, 53, 61, 0.6);
+    }
+
+    .sd-perf-card-topline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .sd-perf-card-title {
+        font-size: 1.02rem;
+        font-weight: 700;
+        color: var(--sd-white);
+        letter-spacing: -0.01em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sd-perf-card-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.68rem;
+        color: var(--sd-text-muted);
+        background-color: var(--sd-surface-1);
+        border: 1px solid rgba(48, 53, 61, 0.6);
+        padding: 2px 7px;
+        border-radius: var(--radius-sm);
+    }
+
+    .sd-perf-card-subtitle {
+        font-size: 0.78rem;
+        color: var(--sd-text-secondary);
+        line-height: 1.35;
+    }
+
+    .sd-perf-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--sd-border);
+        border-radius: var(--radius-sm);
+        background-color: var(--sd-surface-1);
+    }
+
+    .sd-perf-table-wrapper::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+    }
+
+    .sd-perf-table-wrapper::-webkit-scrollbar-track {
+        background: var(--sd-surface-1);
+    }
+
+    .sd-perf-table-wrapper::-webkit-scrollbar-thumb {
+        background: var(--sd-border);
+        border-radius: 3px;
+    }
+
+    .sd-perf-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #424954;
+    }
+
+    .sd-perf-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        text-align: left;
+    }
+
+    .sd-perf-table th {
+        background-color: var(--sd-surface-2);
+        color: var(--sd-text-secondary);
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 7px 6px;
+        border-bottom: 1px solid var(--sd-border);
+        line-height: 1.25;
+        vertical-align: bottom;
+        white-space: normal;
+    }
+
+    .sd-perf-table th.sd-th-num {
+        text-align: right;
+    }
+
+    .sd-th-sub {
+        font-size: 0.60rem;
+        font-weight: 500;
+        color: var(--sd-text-muted);
+        text-transform: none;
+        letter-spacing: normal;
+        display: block;
+        margin-top: 1px;
+    }
+
+    .sd-perf-table td {
+        padding: 7px 6px;
+        border-bottom: 1px solid rgba(48, 53, 61, 0.45);
+        color: var(--sd-text-primary);
+        font-size: 0.78rem;
+        line-height: 1.25;
+        vertical-align: middle;
+    }
+
+    .sd-perf-table td.sd-td-num {
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+    }
+
+    .sd-perf-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .sd-perf-table tr:hover td {
+        background-color: rgba(28, 33, 40, 0.55);
+    }
+
+    .sd-perf-table tr.sd-row-highlight td {
+        background-color: rgba(168, 85, 247, 0.06);
+    }
+
+    .sd-perf-table tr.sd-row-highlight:hover td {
+        background-color: rgba(168, 85, 247, 0.12);
+    }
+
+    .sd-td-sub {
+        font-size: 0.65rem;
+        color: var(--sd-text-secondary);
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.1;
+        margin-top: 1px;
+    }
+
+    .sd-td-sub-pos {
+        font-size: 0.65rem;
+        color: var(--sd-success);
+        font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.1;
+        margin-top: 1px;
+    }
+
+    .sd-td-sub-neg {
+        font-size: 0.65rem;
+        color: #F87171;
+        font-weight: 600;
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.1;
+        margin-top: 1px;
+    }
+
+    .sd-td-sub-muted {
+        font-size: 0.65rem;
+        color: var(--sd-text-muted);
+        line-height: 1.1;
+        margin-top: 1px;
+    }
+
+    .sd-model-sub {
+        font-size: 0.68rem;
+        color: var(--sd-text-secondary);
+        margin-top: 2px;
+        line-height: 1.15;
+    }
+
+    .sd-perf-card-footer {
+        margin-top: 10px;
+        font-size: 0.72rem;
+        color: var(--sd-text-muted);
+        line-height: 1.35;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sd-metric-pos {
+        color: var(--sd-success);
+        font-weight: 700;
+        font-size: 0.72rem;
+        margin-left: 2px;
+    }
+
+    .sd-metric-note {
+        color: var(--sd-text-muted);
+        font-size: 0.70rem;
+        margin-left: 2px;
     }
 
     /* Streamlit Widget Overrides */
@@ -413,6 +647,148 @@ st.markdown("""
 
     div.stRadio > div {
         background-color: transparent !important;
+    }
+
+    /* Prevent text truncation in any Streamlit native metrics */
+    div[data-testid="stMetric"] {
+        background-color: transparent !important;
+    }
+    div[data-testid="stMetricLabel"] {
+        font-size: 0.72rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+        color: var(--sd-text-secondary) !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+    }
+    div[data-testid="stMetricValue"] {
+        font-size: 1.35rem !important;
+        font-weight: 700 !important;
+        color: var(--sd-white) !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+    }
+    div[data-testid="stMetricDelta"] {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+
+    /* Radio Label Wrap Override */
+    div.stRadio div[role="radiogroup"] label {
+        white-space: normal !important;
+    }
+
+    /* Triage Comparison Cards */
+    .sd-triage-card {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-radius: var(--radius-md);
+        padding: 18px 20px;
+        margin-bottom: 20px;
+        transition: border-color 160ms ease, transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sd-triage-card:hover {
+        border-color: #424954;
+        transform: translateY(-1px);
+    }
+
+    .sd-triage-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(48, 53, 61, 0.6);
+    }
+
+    .sd-triage-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--sd-white);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sd-triage-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px 14px;
+    }
+
+    .sd-triage-cell {
+        background-color: var(--sd-surface-1);
+        border: 1px solid rgba(48, 53, 61, 0.6);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 72px;
+    }
+
+    .sd-triage-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--sd-text-secondary);
+        margin-bottom: 4px;
+        line-height: 1.25;
+    }
+
+    .sd-triage-val {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--sd-white);
+        line-height: 1.2;
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .sd-triage-val-compact {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--sd-white);
+        line-height: 1.2;
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .sd-triage-sub {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--sd-text-secondary);
+    }
+
+    .sd-triage-delta {
+        font-size: 0.74rem;
+        font-weight: 600;
+        margin-top: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        line-height: 1.2;
+    }
+
+    .sd-triage-delta-pos {
+        color: var(--sd-success);
+    }
+
+    .sd-triage-delta-neutral {
+        color: var(--sd-text-muted);
     }
 
     /* Product Footer */
@@ -931,30 +1307,158 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    col_tbl1, col_tbl2 = st.columns([1, 1])
-    with col_tbl1:
-        st.markdown("#### Holdout Test Set Performance (`outputs/comparison_table.csv`)")
-        clean_comp = pd.DataFrame({
-            "Model": ["Model A (Die + Spatial)", "Model B (+ Block Sub-Die)"],
-            "Features": [511, 531],
-            "Fail F1": [f"{comp_df.iloc[0]['fail_f1']:.4f}", f"{comp_df.iloc[1]['fail_f1']:.4f} (essentially unchanged)"],
-            "PR-AUC": [f"{comp_df.iloc[0]['pr_auc']:.4f}", f"{comp_df.iloc[1]['pr_auc']:.4f} (+0.0337)"],
-            "Fail Recall": [f"{comp_df.iloc[0]['fail_recall']*100:.1f}%", f"{comp_df.iloc[1]['fail_recall']*100:.1f}%"],
-            "Fail Precision": [f"{comp_df.iloc[0]['fail_precision']*100:.1f}%", f"{comp_df.iloc[1]['fail_precision']*100:.1f}%"],
-            "Tuned Threshold": [f"{meta_a['threshold']:.4f}", f"{meta_b['threshold']:.4f}"],
-        })
-        st.dataframe(clean_comp, use_container_width=True, hide_index=True)
+    # -------------------------------------------------------------------------
+    # Shared Responsive Table Comparison Section (Holdout + Ablation)
+    # -------------------------------------------------------------------------
+    f1_a = comp_df.iloc[0]['fail_f1']
+    f1_b = comp_df.iloc[1]['fail_f1']
+    prauc_a = comp_df.iloc[0]['pr_auc']
+    prauc_b = comp_df.iloc[1]['pr_auc']
+    prauc_delta = prauc_b - prauc_a
+    rec_a = comp_df.iloc[0]['fail_recall'] * 100
+    rec_b = comp_df.iloc[1]['fail_recall'] * 100
+    rec_delta = rec_b - rec_a
+    prec_a = comp_df.iloc[0]['fail_precision'] * 100
+    prec_b = comp_df.iloc[1]['fail_precision'] * 100
+    prec_delta = prec_b - prec_a
+    th_a = meta_a['threshold']
+    th_b = meta_b['threshold']
 
-    with col_tbl2:
-        st.markdown("#### 5-Seed Validation Ablation (`outputs/ablation_table_multiseed.csv`)")
-        clean_abl = pd.DataFrame({
-            "Feature Configuration": abl_df["Feature Set"],
-            "PR-AUC (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["PR-AUC mean"], abl_df["PR-AUC std"])],
-            "Fail F1 (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["Fail F1 mean"], abl_df["Fail F1 std"])],
-            "Fail Recall": [f"{m*100:.1f}%" for m in abl_df["Fail Rec mean"]],
-            "Fail Precision": [f"{m*100:.1f}%" for m in abl_df["Fail Prec mean"]],
-        })
-        st.dataframe(clean_abl, use_container_width=True, hide_index=True)
+    # Build rows for 5-Seed Validation Ablation
+    abl_rows = []
+    for _, row in abl_df.iterrows():
+        feat_name = str(row["Feature Set"])
+        is_highlight = "Block" in feat_name and "Spatial" in feat_name
+        row_cls = ' class="sd-row-highlight"' if is_highlight else ''
+        if is_highlight:
+            badge_html = ' <span class="sd-badge-model-b" style="font-size:0.60rem;padding:1px 5px;margin-left:3px;">Model B</span>'
+            name_html = f'<span style="font-weight:700;color:#FFFFFF;">{feat_name}</span>{badge_html}'
+            prauc_main = f'<span style="color:#43D17C;font-weight:700;">{row["PR-AUC mean"]:.4f}</span>'
+        elif feat_name == "Die + Spatial":
+            badge_html = ' <span class="sd-badge-model-a" style="font-size:0.60rem;padding:1px 5px;margin-left:3px;">Model A</span>'
+            name_html = f'<span style="font-weight:600;color:#E1E4EA;">{feat_name}</span>{badge_html}'
+            prauc_main = f'{row["PR-AUC mean"]:.4f}'
+        else:
+            name_html = f'<span style="color:#C9D1D9;">{feat_name}</span>'
+            prauc_main = f'{row["PR-AUC mean"]:.4f}'
+
+        prauc_sub = f'<div class="sd-td-sub">±{row["PR-AUC std"]:.4f}</div>'
+        f1_main = f'{row["Fail F1 mean"]:.4f}'
+        f1_sub = f'<div class="sd-td-sub">±{row["Fail F1 std"]:.4f}</div>'
+        rec_val = f'{row["Fail Rec mean"]*100:.1f}%'
+        prec_val = f'{row["Fail Prec mean"]*100:.1f}%'
+
+        abl_rows.append(
+            f'<tr{row_cls}>'
+            f'<td>{name_html}</td>'
+            f'<td class="sd-td-num">{prauc_main}{prauc_sub}</td>'
+            f'<td class="sd-td-num">{f1_main}{f1_sub}</td>'
+            f'<td class="sd-td-num">{rec_val}</td>'
+            f'<td class="sd-td-num">{prec_val}</td>'
+            f'</tr>'
+        )
+    abl_tbody = "".join(abl_rows)
+
+    tables_html = (
+        '<div id="holdout-test-set-performance-outputs-comparison-table-csv"></div>'
+        '<div id="5-seed-validation-ablation-outputs-ablation-table-multiseed-csv"></div>'
+        '<div class="sd-table-comparison-grid">'
+        '<!-- Card 1: Holdout Test Set Performance -->'
+        '<div class="sd-perf-card">'
+        '<div class="sd-perf-card-header">'
+        '<div class="sd-perf-card-topline">'
+        '<div class="sd-perf-card-title">'
+        '<span style="display:inline-block;width:8px;height:8px;background-color:#F51B0B;border-radius:1px;"></span>'
+        'Holdout Test Set Performance'
+        '</div>'
+        '<span class="sd-perf-card-tag">outputs/comparison_table.csv</span>'
+        '</div>'
+        '<div class="sd-perf-card-subtitle">'
+        'Rigorous holdout evaluation on 39,351 unseen dies across 40 holdout wafers at tuned thresholds.'
+        '</div>'
+        '</div>'
+        '<div class="sd-perf-table-wrapper">'
+        '<table class="sd-perf-table">'
+        '<thead>'
+        '<tr>'
+        '<th class="sd-th">Model</th>'
+        '<th class="sd-th sd-th-num">Feats</th>'
+        '<th class="sd-th sd-th-num">Fail F1</th>'
+        '<th class="sd-th sd-th-num">PR-AUC</th>'
+        '<th class="sd-th sd-th-num">Fail<br>Recall</th>'
+        '<th class="sd-th sd-th-num">Fail<br>Prec</th>'
+        '<th class="sd-th sd-th-num">Tuned<br>Thresh</th>'
+        '</tr>'
+        '</thead>'
+        '<tbody>'
+        '<tr>'
+        '<td>'
+        '<span class="sd-badge-model-a">Model A</span>'
+        '<div class="sd-model-sub">Die + Spatial</div>'
+        '</td>'
+        '<td class="sd-td-num">511</td>'
+        f'<td class="sd-td-num">{f1_a:.4f}</td>'
+        f'<td class="sd-td-num">{prauc_a:.4f}</td>'
+        f'<td class="sd-td-num">{rec_a:.1f}%</td>'
+        f'<td class="sd-td-num">{prec_a:.1f}%</td>'
+        f'<td class="sd-td-num">{th_a:.4f}</td>'
+        '</tr>'
+        '<tr class="sd-row-highlight">'
+        '<td>'
+        '<span class="sd-badge-model-b">Model B</span>'
+        '<div class="sd-model-sub" style="color:#C084FC;">+ Block Sub-Die</div>'
+        '</td>'
+        '<td class="sd-td-num" style="color:#C084FC;font-weight:700;">531</td>'
+        f'<td class="sd-td-num">{f1_b:.4f}<div class="sd-td-sub-muted">unchanged</div></td>'
+        f'<td class="sd-td-num"><span style="color:#43D17C;font-weight:700;">{prauc_b:.4f}</span><div class="sd-td-sub-pos">+{prauc_delta:.4f}</div></td>'
+        f'<td class="sd-td-num">{rec_b:.1f}%<div class="sd-td-sub-pos">+{rec_delta:.1f}%</div></td>'
+        f'<td class="sd-td-num">{prec_b:.1f}%<div class="sd-td-sub-neg">{prec_delta:.1f}%</div></td>'
+        f'<td class="sd-td-num">{th_b:.4f}</td>'
+        '</tr>'
+        '</tbody>'
+        '</table>'
+        '</div>'
+        '<div class="sd-perf-card-footer">'
+        '<span style="color:#43D17C;font-weight:700;">✓</span>'
+        '<span>PR-AUC improves +0.0337 (+6.7%) with +20 sub-die features while preserving 97.1% overall accuracy.</span>'
+        '</div>'
+        '</div>'
+        '<!-- Card 2: 5-Seed Validation Ablation -->'
+        '<div class="sd-perf-card">'
+        '<div class="sd-perf-card-header">'
+        '<div class="sd-perf-card-topline">'
+        '<div class="sd-perf-card-title">'
+        '<span style="display:inline-block;width:8px;height:8px;background-color:#A855F7;border-radius:1px;"></span>'
+        '5-Seed Validation Ablation'
+        '</div>'
+        '<span class="sd-perf-card-tag">outputs/ablation_table_multiseed.csv</span>'
+        '</div>'
+        '<div class="sd-perf-card-subtitle">'
+        'Stratified cross-validation across 5 random seeds (25 folds per configuration) measuring signal progression.'
+        '</div>'
+        '</div>'
+        '<div class="sd-perf-table-wrapper">'
+        '<table class="sd-perf-table">'
+        '<thead>'
+        '<tr>'
+        '<th class="sd-th">Feature Configuration</th>'
+        '<th class="sd-th sd-th-num">PR-AUC<span class="sd-th-sub">Mean ± Std</span></th>'
+        '<th class="sd-th sd-th-num">Fail F1<span class="sd-th-sub">Mean ± Std</span></th>'
+        '<th class="sd-th sd-th-num">Fail Recall<span class="sd-th-sub">Mean</span></th>'
+        '<th class="sd-th sd-th-num">Fail Precision<span class="sd-th-sub">Mean</span></th>'
+        '</tr>'
+        '</thead>'
+        f'<tbody>{abl_tbody}</tbody>'
+        '</table>'
+        '</div>'
+        '<div class="sd-perf-card-footer">'
+        '<span style="color:#A855F7;font-weight:700;">✓</span>'
+        '<span>Sub-die block signals raise 5-seed validation PR-AUC from 0.4914 to 0.5265 (+0.0351 gain).</span>'
+        '</div>'
+        '</div>'
+        '</div>'
+    )
+    st.markdown(tables_html, unsafe_allow_html=True)
 
     # -------------------------------------------------------------------------
     # SIDEBAR: Control Center (design.md Section 15)
@@ -1573,45 +2077,113 @@ def main():
     stats_a = topk_stats(y_scope, s_a, screen_k_pct / 100.0, score_cal=s_a_cal)
     stats_b = topk_stats(y_scope, s_b, screen_k_pct / 100.0, score_cal=s_b_cal)
 
-    # Side-by-side metrics
+    # Side-by-side comparison cards (Unified HTML cards — No empty boxes, zero truncation)
     score_label = "Mean Calibrated Risk" if use_cal else "Mean Risk Score"
-    
+
+    cal_rate_a_str = f"{stats_a['mean_calibrated_rate']*100:.1f}%" if stats_a['mean_calibrated_rate'] is not None else f"{stats_a['mean_score']:.3f}"
+    cal_rate_b_str = f"{stats_b['mean_calibrated_rate']*100:.1f}%" if stats_b['mean_calibrated_rate'] is not None else f"{stats_b['mean_score']:.3f}"
+
+    diff_fails = stats_b['n_fails_captured'] - stats_a['n_fails_captured']
+    diff_cap = (stats_b['capture_rate'] - stats_a['capture_rate']) * 100
+    diff_prec = (stats_b['observed_fail_rate'] - stats_a['observed_fail_rate']) * 100
+    diff_lift = stats_b['lift'] - stats_a['lift']
+
+    delta_fails_cls = "sd-triage-delta-pos" if diff_fails > 0 else "sd-triage-delta-neutral"
+    delta_cap_cls = "sd-triage-delta-pos" if diff_cap > 0 else "sd-triage-delta-neutral"
+    delta_prec_cls = "sd-triage-delta-pos" if diff_prec >= 0 else "sd-triage-delta-neutral"
+    delta_lift_cls = "sd-triage-delta-pos" if diff_lift >= 0 else "sd-triage-delta-neutral"
+
     col_t1, col_t2 = st.columns(2)
     with col_t1:
-        st.markdown('<div class="sd-card" style="border-left: 3px solid #25B9E6; margin-bottom: 16px;">', unsafe_allow_html=True)
-        st.markdown("#### Model A (Spatial Baseline)")
-        col_sub1, col_sub2, col_sub3 = st.columns(3)
-        with col_sub1:
-            st.metric("Dies Screened", f"{stats_a['n_screened']:,} ({screen_k_pct:.1f}%)")
-            st.metric("Failure Rate (Precision)", f"{stats_a['observed_fail_rate']*100:.1f}%")
-        with col_sub2:
-            st.metric("Failures Captured", f"{stats_a['n_fails_captured']:,} / {stats_a['n_fails_total']:,}")
-            st.metric("Capture Rate", f"{stats_a['capture_rate']*100:.1f}%")
-        with col_sub3:
-            st.metric("Screening Lift", f"{stats_a['lift']:.2f}×")
-            cal_rate_a = f"{stats_a['mean_calibrated_rate']*100:.1f}%" if stats_a['mean_calibrated_rate'] is not None else f"{stats_a['mean_score']:.3f}"
-            st.metric(score_label, cal_rate_a)
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="sd-triage-card" style="border-left: 4px solid var(--sd-model-a);">
+            <div class="sd-triage-header">
+                <div class="sd-triage-title">
+                    <span style="display:inline-block; width:8px; height:8px; background:var(--sd-model-a); border-radius:1px;"></span>
+                    Model A (Spatial Baseline)
+                </div>
+                <span class="sd-badge-model-a">Baseline · 511 Feats</span>
+            </div>
+            <div class="sd-triage-grid">
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Dies Screened</div>
+                    <div class="sd-triage-val-compact font-mono">{stats_a['n_screened']:,} <span class="sd-triage-sub">({screen_k_pct:.1f}%)</span></div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">Budget: {screen_k_pct:.1f}%</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Failures Captured</div>
+                    <div class="sd-triage-val-compact font-mono">{stats_a['n_fails_captured']:,} <span class="sd-triage-sub">/ {stats_a['n_fails_total']:,}</span></div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">True defect dies</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Capture Rate</div>
+                    <div class="sd-triage-val font-mono" style="color: var(--sd-model-a);">{stats_a['capture_rate']*100:.1f}%</div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">Of all failures</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Failure Rate (Precision)</div>
+                    <div class="sd-triage-val font-mono">{stats_a['observed_fail_rate']*100:.1f}%</div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">Screened precision</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Screening Lift</div>
+                    <div class="sd-triage-val font-mono">{stats_a['lift']:.2f}×</div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">vs Random (1.0×)</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">{score_label}</div>
+                    <div class="sd-triage-val font-mono">{cal_rate_a_str}</div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">{'Calibrated risk' if use_cal else 'Raw score'}</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col_t2:
-        st.markdown('<div class="sd-card" style="border-left: 3px solid #A855F7; margin-bottom: 16px;">', unsafe_allow_html=True)
-        st.markdown("#### Model B (Multi-Resolution)")
-        col_sub1, col_sub2, col_sub3 = st.columns(3)
-        with col_sub1:
-            st.metric("Dies Screened", f"{stats_b['n_screened']:,} ({screen_k_pct:.1f}%)")
-            diff_prec = (stats_b['observed_fail_rate'] - stats_a['observed_fail_rate']) * 100
-            st.metric("Failure Rate (Precision)", f"{stats_b['observed_fail_rate']*100:.1f}%", delta=f"{diff_prec:+.1f}%")
-        with col_sub2:
-            diff_fails = stats_b['n_fails_captured'] - stats_a['n_fails_captured']
-            st.metric("Failures Captured", f"{stats_b['n_fails_captured']:,} / {stats_b['n_fails_total']:,}", delta=f"{diff_fails:+d} dies")
-            diff_cap = (stats_b['capture_rate'] - stats_a['capture_rate']) * 100
-            st.metric("Capture Rate", f"{stats_b['capture_rate']*100:.1f}%", delta=f"{diff_cap:+.1f}%")
-        with col_sub3:
-            diff_lift = stats_b['lift'] - stats_a['lift']
-            st.metric("Screening Lift", f"{stats_b['lift']:.2f}×", delta=f"{diff_lift:+.2f}×")
-            cal_rate_b = f"{stats_b['mean_calibrated_rate']*100:.1f}%" if stats_b['mean_calibrated_rate'] is not None else f"{stats_b['mean_score']:.3f}"
-            st.metric(score_label, cal_rate_b)
-        st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div class="sd-triage-card" style="border-left: 4px solid var(--sd-model-b);">
+            <div class="sd-triage-header">
+                <div class="sd-triage-title">
+                    <span style="display:inline-block; width:8px; height:8px; background:var(--sd-model-b); border-radius:1px;"></span>
+                    Model B (Multi-Resolution)
+                </div>
+                <span class="sd-badge-model-b">Champion · 531 Feats</span>
+            </div>
+            <div class="sd-triage-grid">
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Dies Screened</div>
+                    <div class="sd-triage-val-compact font-mono">{stats_b['n_screened']:,} <span class="sd-triage-sub">({screen_k_pct:.1f}%)</span></div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">Same budget</div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Failures Captured</div>
+                    <div class="sd-triage-val-compact font-mono">{stats_b['n_fails_captured']:,} <span class="sd-triage-sub">/ {stats_b['n_fails_total']:,}</span></div>
+                    <div class="sd-triage-delta {delta_fails_cls}"><strong>{diff_fails:+d} dies</strong></div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Capture Rate</div>
+                    <div class="sd-triage-val font-mono" style="color: var(--sd-model-b);">{stats_b['capture_rate']*100:.1f}%</div>
+                    <div class="sd-triage-delta {delta_cap_cls}"><strong>{diff_cap:+.1f}%</strong></div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Failure Rate (Precision)</div>
+                    <div class="sd-triage-val font-mono">{stats_b['observed_fail_rate']*100:.1f}%</div>
+                    <div class="sd-triage-delta {delta_prec_cls}"><strong>{diff_prec:+.1f}%</strong></div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">Screening Lift</div>
+                    <div class="sd-triage-val font-mono">{stats_b['lift']:.2f}×</div>
+                    <div class="sd-triage-delta {delta_lift_cls}"><strong>{diff_lift:+.2f}×</strong></div>
+                </div>
+                <div class="sd-triage-cell">
+                    <div class="sd-triage-label">{score_label}</div>
+                    <div class="sd-triage-val font-mono">{cal_rate_b_str}</div>
+                    <div class="sd-triage-delta sd-triage-delta-neutral">{'Calibrated risk' if use_cal else 'Raw score'}</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
 
     # Render Gains Curve (design.md Section 27)
     k_pts_a, cap_curve_a, _ = capture_curve(y_scope, s_a, n_points=200)
