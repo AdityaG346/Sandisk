@@ -1,4 +1,4 @@
-﻿"""
+"""
 tools/check_frozen.py
 =====================
 Verify that all frozen artifacts match the SHA-256 hashes recorded in
@@ -32,6 +32,37 @@ def sha256_file(path: Path, chunk: int = 1 << 20) -> str:
     return h.hexdigest()
 
 
+def verify_frozen(repo_root: Path | None = None) -> tuple[bool, dict[str, str]]:
+    """Verify all frozen artifacts. Returns (all_ok, results_dict)."""
+    if repo_root is None:
+        repo_root = Path(__file__).resolve().parent.parent
+    hash_path = repo_root / HASH_FILE
+
+    if not hash_path.exists():
+        return False, {"HASH_FILE": "NOT FOUND"}
+
+    with open(hash_path, encoding="utf-8") as f:
+        expected: dict[str, str] = json.load(f)
+
+    results: dict[str, str] = {}
+    all_ok = True
+
+    for rel, expected_digest in expected.items():
+        p = repo_root / rel
+        if not p.exists():
+            results[rel] = "MISSING"
+            all_ok = False
+            continue
+        actual = sha256_file(p)
+        if actual == expected_digest:
+            results[rel] = "OK"
+        else:
+            results[rel] = f"MISMATCH (expected {expected_digest[:8]}, got {actual[:8]})"
+            all_ok = False
+
+    return all_ok, results
+
+
 def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
     hash_path = repo_root / HASH_FILE
@@ -41,28 +72,16 @@ def main() -> int:
         print("  Run `python tools/freeze_artifacts.py` first.")
         return 1
 
-    with open(hash_path, encoding="utf-8") as f:
-        expected: dict[str, str] = json.load(f)
+    all_ok, results = verify_frozen(repo_root)
 
-    n_ok = 0
-    n_fail = 0
+    n_ok = sum(1 for s in results.values() if s == "OK")
+    n_fail = len(results) - n_ok
 
-    for rel, expected_digest in expected.items():
-        p = repo_root / rel
-        if not p.exists():
-            print(f"  [MISSING] {rel}")
-            n_fail += 1
-            continue
-        actual = sha256_file(p)
-        if actual == expected_digest:
-            n_ok += 1
-        else:
-            print(f"  [MISMATCH] {rel}")
-            print(f"    expected: {expected_digest}")
-            print(f"    actual:   {actual}")
-            n_fail += 1
+    for rel, status in results.items():
+        if status != "OK":
+            print(f"  [{status}] {rel}")
 
-    if n_fail == 0:
+    if all_ok:
         print(f"[check_frozen] ALL {n_ok} frozen artifacts OK.")
         return 0
     else:
