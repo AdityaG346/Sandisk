@@ -100,10 +100,12 @@ W_F_0001,5,13,1
 ## Repository Structure
 - **`src/`**: Modular Python library containing data loaders, spatial and block feature engineering, anomaly detectors, Model A/B definitions, evaluation routines, and visualization tools.
 - **`dashboard/`**: Interactive Streamlit presentation application (`app.py`), cloud dependencies (`requirements.txt`), and live demo guide.
+- **`tests/`**: Automated regression and guardrail test suites (`tests/test_guardrails.py`).
+- **`tools/`**: Verification and utility scripts (`tools/check_frozen.py`, `tools/freeze_artifacts.py`, `tools/generate_triage_slide.py`).
 - **`input/`**: Directory holding raw and generated dataset CSVs (`train.csv`, `test.csv`, and `validation.csv`).
 - **`outputs/`**: Final production model checkpoints (`model_a.pkl`, `model_b.pkl`), evaluation tables, exact SHAP statistics, wafer heatmaps, and comprehensive documentation.
 - **`archive/`**: Archived intermediate tuning scripts, experimental runs, and scratch files preserved for reproducibility.
-- **`docs/`**: Non-technical plain-language project documentation and deliverable guide ([`project_explanation.md`](docs/project_explanation.md)).
+- **`docs/`**: Technical documentation ([`technical_documentation.md`](docs/technical_documentation.md)), non-technical guide ([`project_explanation.md`](docs/project_explanation.md)), and baseline findings ([`PHASE1_FINDINGS.md`](docs/PHASE1_FINDINGS.md)).
 
 ---
 
@@ -114,18 +116,23 @@ All steps can be reproduced from the project root using standard Python 3.10+:
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Run automated Part 1 regression guardrails (verifies data alignment and assertions)
-python test_part1_guardrails.py
+# 2. Run automated multi-tier smoke test suite
+python smoke_test.py --tier A     # Fast 8-step verification (no heavy raw data dependencies)
+python smoke_test.py --tier B     # Full pipeline reproduction & prediction hash verification
 
-# 3. (Optional) Regenerate synthetic data from LSWMD.pkl using local config if input/*.csv are missing
+# 3. (Optional) Run Part 1 regression guardrails directly
+python test_part1_guardrails.py   # or: python -m unittest tests/test_guardrails.py
+
+# 4. (Optional) Regenerate synthetic data from LSWMD.pkl using local config if input/*.csv are missing
 python generate_data.py --config config_local.yaml
 
-# 4. Execute end-to-end training, evaluation, statistical tests, SHAP, and report generation
+# 5. Execute end-to-end training, evaluation, statistical tests, SHAP, and report generation
 python run_all.py --config config_local.yaml
 
-# 5. Generate submission predictions CSV
+# 6. Generate submission predictions CSV
 python finalize.py
 
-# 6. Launch interactive Streamlit presentation dashboard
+# 7. Launch interactive Streamlit presentation dashboard
 streamlit run dashboard/app.py
 ```
+

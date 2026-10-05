@@ -25,3 +25,9 @@ Thumbs.db
 outputs_repro/
 outputs_runall/
 outputs_smoke/
+
+# Logs and test caches
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
