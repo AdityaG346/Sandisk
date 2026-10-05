@@ -33,11 +33,17 @@
   },
   "triage": {
     "A_top2pct": 0.38115942028985506,
+    "A_top2pct_count": 526,
     "B_top2pct": 0.38768115942028986,
+    "B_top2pct_count": 535,
     "A_top5pct": 0.46159420289855074,
+    "A_top5pct_count": 637,
     "B_top5pct": 0.4971014492753623,
+    "B_top5pct_count": 686,
     "A_top10pct": 0.5565217391304348,
-    "B_top10pct": 0.6043478260869565
+    "A_top10pct_count": 768,
+    "B_top10pct": 0.6043478260869565,
+    "B_top10pct_count": 834
   },
   "known_good_bootstrap_b_minus_a": {
     "pr_auc_delta": "+0.034",
@@ -45,5 +51,23 @@
     "fail_f1_delta": "+0.001",
     "fail_f1_ci": "[-0.008, +0.012]",
     "note": "wafer-cluster bootstrap, 1000 iterations, 40 test wafers"
+  },
+  "calibration": {
+    "model_a": {
+      "raw_ece": 0.03357903001726054,
+      "cal_ece": 0.008413932938501907,
+      "ece_reduction_pct": 74.94289461554752,
+      "raw_brier": 0.028726427346823465,
+      "cal_brier": 0.026489876274834092
+    },
+    "model_b": {
+      "raw_ece": 0.02931317567140164,
+      "cal_ece": 0.008511137904854079,
+      "ece_reduction_pct": 70.96480435875235,
+      "raw_brier": 0.028032331553112837,
+      "cal_brier": 0.025987275771176585
+    },
+    "method": "Platt scaling (univariate logistic regression on validation eligible dies)",
+    "binning": "10-bin equal-frequency quantile ECE on 40 held-out test wafers"
   }
 }

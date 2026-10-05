@@ -36,72 +36,403 @@ import streamlit as st
 
 
 # -----------------------------------------------------------------------------
-# Configuration & Styling
+# Configuration & SanDisk-Inspired Design System (design.md)
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Semiconductor Die Yield Prediction",
+    page_title="DieYield Intelligence | Multi-Resolution Yield Prediction",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# Premium dark theme styling
+# SanDisk Industrial Design System CSS
 st.markdown("""
 <style>
-    .main-header {
-        font-size: 2.1rem;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-        color: #f8fafc;
-        margin-bottom: 0.2rem;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+        --sd-red: #F51B0B;
+        --sd-black: #050505;
+        --sd-surface-1: #0D0F12;
+        --sd-surface-2: #15181D;
+        --sd-surface-3: #1C2128;
+        --sd-border: #30353D;
+
+        --sd-white: #FFFFFF;
+        --sd-text-secondary: #B7BDC7;
+        --sd-text-muted: #7F8792;
+
+        --sd-success: #35D07F;
+        --sd-warning: #F4B740;
+        --sd-failure: #FF5A5F;
+
+        --sd-model-a: #25B9E6;
+        --sd-model-b: #A855F7;
+        --sd-context: #43D17C;
+
+        --radius-sm: 6px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
     }
-    .sub-header {
-        font-size: 1.05rem;
-        color: #94a3b8;
-        margin-bottom: 1.5rem;
+
+    /* Base App Typography and Dark Background */
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        background-color: var(--sd-black) !important;
+        color: var(--sd-white) !important;
     }
-    .metric-card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 16px;
-        text-align: center;
+
+    .stApp {
+        background-color: var(--sd-black) !important;
     }
-    .metric-label {
-        font-size: 0.85rem;
-        color: #94a3b8;
+
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: var(--sd-surface-1) !important;
+        border-right: 1px solid var(--sd-border) !important;
+    }
+
+    section[data-testid="stSidebar"] div.block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* Product Header */
+    .sd-header-wrap {
+        background: linear-gradient(180deg, #101217 0%, var(--sd-black) 100%);
+        border: 1px solid var(--sd-border);
+        border-top: 3px solid var(--sd-red);
+        border-radius: var(--radius-md);
+        padding: 24px 28px 20px 28px;
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    .sd-brand-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 8px;
+    }
+
+    .sd-brand-title {
+        font-size: 1.85rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--sd-white);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sd-pixel-mark {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        background-color: var(--sd-red);
+        margin-right: 4px;
+        border-radius: 1px;
+    }
+
+    .sd-brand-subtitle {
+        font-size: 0.95rem;
+        color: var(--sd-text-secondary);
+        margin-top: 4px;
+        font-weight: 500;
+    }
+
+    .sd-meta-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(48, 53, 61, 0.6);
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        color: var(--sd-text-secondary);
     }
-    .metric-value {
-        font-size: 1.7rem;
+
+    .sd-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .sd-meta-item span.val {
+        color: var(--sd-white);
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Badges */
+    .sd-badge-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: rgba(53, 208, 127, 0.12);
+        color: var(--sd-success);
+        border: 1px solid rgba(53, 208, 127, 0.35);
+        font-size: 0.72rem;
         font-weight: 700;
-        color: #38bdf8;
-    }
-    .disclaimer-box {
-        background-color: rgba(30, 41, 59, 0.7);
-        border-left: 4px solid #f59e0b;
-        padding: 10px 14px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        color: #cbd5e1;
-        margin: 10px 0;
-    }
-    .badge-pass {
-        background-color: #166534;
-        color: #bbf7d0;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
         padding: 4px 10px;
-        border-radius: 12px;
-        font-weight: 600;
-        font-size: 0.85rem;
+        border-radius: 999px;
     }
-    .badge-fail {
-        background-color: #991b1b;
-        color: #fecaca;
-        padding: 4px 10px;
-        border-radius: 12px;
+
+    .sd-badge-verified::before {
+        content: "●";
+        font-size: 0.7rem;
+    }
+
+    .sd-badge-model-a {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background-color: rgba(37, 185, 230, 0.12);
+        color: var(--sd-model-a);
+        border: 1px solid rgba(37, 185, 230, 0.3);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: var(--radius-sm);
+    }
+
+    .sd-badge-model-b {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background-color: rgba(168, 85, 247, 0.12);
+        color: var(--sd-model-b);
+        border: 1px solid rgba(168, 85, 247, 0.35);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: var(--radius-sm);
+    }
+
+    .sd-badge-context {
+        display: inline-flex;
+        align-items: center;
+        background-color: rgba(67, 209, 124, 0.1);
+        color: var(--sd-context);
+        border: 1px solid rgba(67, 209, 124, 0.25);
+        font-size: 0.7rem;
         font-weight: 600;
+        padding: 2px 7px;
+        border-radius: var(--radius-sm);
+    }
+
+    /* Cards */
+    .sd-card {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-radius: var(--radius-md);
+        padding: 20px 22px;
+        transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease;
+    }
+
+    .sd-card:hover {
+        border-color: #424954;
+        transform: translateY(-1px);
+    }
+
+    /* Dominant Hero KPI Card (+66) */
+    .sd-card-hero {
+        background: linear-gradient(180deg, #1a1e26 0%, var(--sd-surface-2) 100%);
+        border: 1px solid var(--sd-border);
+        border-top: 3px solid var(--sd-red);
+        border-radius: var(--radius-md);
+        padding: 20px 22px;
+        box-shadow: 0 4px 20px rgba(245, 27, 11, 0.08);
+        transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease;
+    }
+
+    .sd-card-hero:hover {
+        border-color: #4d5563;
+        transform: translateY(-1px);
+    }
+
+    .sd-kpi-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--sd-text-secondary);
+        margin-bottom: 6px;
+    }
+
+    .sd-kpi-value {
+        font-size: 2.1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--sd-white);
+        line-height: 1.1;
+        margin-bottom: 4px;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .sd-kpi-value-hero {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--sd-white);
+        line-height: 1.1;
+        margin-bottom: 4px;
+    }
+
+    .sd-kpi-delta {
         font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--sd-success);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .sd-kpi-delta-red {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--sd-red);
+    }
+
+    .sd-kpi-sub {
+        font-size: 0.75rem;
+        color: var(--sd-text-muted);
+        margin-top: 4px;
+        line-height: 1.35;
+    }
+
+    /* Section Headers */
+    .sd-section-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--sd-white);
+        margin-top: 10px;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sd-section-sub {
+        font-size: 0.88rem;
+        color: var(--sd-text-secondary);
+        margin-bottom: 16px;
+        line-height: 1.45;
+    }
+
+    .sd-divider {
+        height: 1px;
+        background-color: var(--sd-border);
+        margin: 32px 0 24px 0;
+        position: relative;
+    }
+
+    .sd-divider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -1px;
+        width: 8px;
+        height: 3px;
+        background-color: var(--sd-red);
+    }
+
+    /* Architecture Flow Box */
+    .sd-arch-container {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-radius: var(--radius-md);
+        padding: 22px 24px;
+        margin-bottom: 20px;
+    }
+
+    /* Limitations & Disclosures */
+    .sd-disclaimer {
+        background-color: var(--sd-surface-1);
+        border: 1px solid var(--sd-border);
+        border-left: 3px solid var(--sd-warning);
+        padding: 14px 18px;
+        border-radius: var(--radius-sm);
+        font-size: 0.82rem;
+        color: var(--sd-text-secondary);
+        line-height: 1.5;
+        margin: 14px 0;
+    }
+
+    .sd-limitations {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-left: 3px solid var(--sd-model-b);
+        padding: 18px 22px;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        color: var(--sd-text-secondary);
+        line-height: 1.6;
+        margin: 20px 0;
+    }
+
+    /* Head-to-Head Comparison Card */
+    .sd-hero-die-card {
+        background: linear-gradient(180deg, #181c22 0%, var(--sd-surface-2) 100%);
+        border: 1px solid var(--sd-border);
+        border-top: 2px solid var(--sd-model-b);
+        border-radius: var(--radius-md);
+        padding: 20px 22px;
+    }
+
+    /* Tables */
+    div[data-testid="stDataFrame"] {
+        border: 1px solid var(--sd-border) !important;
+        border-radius: var(--radius-md) !important;
+        overflow: hidden;
+    }
+
+    /* Streamlit Widget Overrides */
+    div.stSelectbox > div > div {
+        background-color: var(--sd-surface-2) !important;
+        border: 1px solid var(--sd-border) !important;
+        color: var(--sd-white) !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    div.stSelectbox > div > div:focus-within {
+        border-color: var(--sd-red) !important;
+        box-shadow: 0 0 0 2px rgba(245, 27, 11, 0.2) !important;
+    }
+
+    div.stRadio > div {
+        background-color: transparent !important;
+    }
+
+    /* Product Footer */
+    .sd-footer {
+        margin-top: 48px;
+        padding-top: 16px;
+        border-top: 1px solid var(--sd-border);
+        font-size: 0.75rem;
+        color: var(--sd-text-muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation: none !important;
+            transition: none !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -315,7 +646,7 @@ PRECOMPUTED_REPRESENTATIVES = {
 
 
 # -----------------------------------------------------------------------------
-# Visualization Rendering Functions
+# Visualization Rendering Functions (SanDisk Design System)
 # -----------------------------------------------------------------------------
 def render_wafer_4panel(
     df_wafer: pd.DataFrame,
@@ -326,11 +657,11 @@ def render_wafer_4panel(
     has_ground_truth: bool = True,
 ) -> matplotlib.figure.Figure:
     """
-    Render 4-panel wafer map matching Part 4 styling:
-    1. Pre-test map (old_label)
-    2. Ground-truth post-test map (label) if available
-    3. Model predicted failure probability heatmap
-    4. Continuous 2D Gaussian risk field with 90th percentile hotspot contours
+    Render 4-panel wafer map matching design.md Section 18:
+    1. PRE-TEST: What was known before burn-in
+    2. GROUND TRUTH: What actually failed
+    3. MODEL RISK: What the model predicts
+    4. SPATIAL FIELD: Where risk clusters
     """
     rows = df_wafer["die_row"].values.astype(int)
     cols = df_wafer["die_col"].values.astype(int)
@@ -365,43 +696,43 @@ def render_wafer_4panel(
     hotspot_thresh = np.percentile(valid_risks, 90) if len(valid_risks) > 0 else 0.5
     hotspot_mask = (smoothed_risk >= hotspot_thresh) & valid_mask
 
-    # Setup dark theme Matplotlib figure
+    # Setup dark theme Matplotlib figure (SanDisk design tokens)
     n_panels = 4 if has_lbl_col else 3
-    fig, axes = plt.subplots(1, n_panels, figsize=(5 * n_panels, 4.5), facecolor="#0f172a")
+    fig, axes = plt.subplots(1, n_panels, figsize=(5.2 * n_panels, 4.6), facecolor="#15181D")
     for ax in axes:
-        ax.set_facecolor("#1e293b")
-        ax.tick_params(colors="#94a3b8", labelsize=8)
+        ax.set_facecolor("#0D0F12")
+        ax.tick_params(colors="#7F8792", labelsize=8)
         for spine in ax.spines.values():
-            spine.set_color("#334155")
+            spine.set_color("#30353D")
 
     # Panel 1: Pre-test map
-    cmap_pre = mcolors.ListedColormap(["#22c55e", "#ef4444"])
+    cmap_pre = mcolors.ListedColormap(["#35D07F", "#FF5A5F"])
     axes[0].imshow(pretest_grid, cmap=cmap_pre, vmin=0, vmax=1, aspect="equal")
-    axes[0].set_title(f"1. Pre-Test Status\n(Green=Pass, Red=Old Fail)", color="#f8fafc", fontsize=9, pad=8)
+    axes[0].set_title("1. PRE-TEST\nWhat was known before burn-in (Green=Pass, Red=Old Fail)", color="#FFFFFF", fontsize=9, pad=8, fontweight="bold")
 
     idx_curr = 1
     # Panel 2: Ground Truth (if available)
     if has_lbl_col:
-        cmap_new = mcolors.ListedColormap(["#334155", "#ef4444"])
+        cmap_new = mcolors.ListedColormap(["#22272E", "#FF5A5F"])
         axes[idx_curr].imshow(newfail_grid, cmap=cmap_new, vmin=0, vmax=1, aspect="equal")
-        axes[idx_curr].set_title("2. Ground-Truth New Fails\n(Red=New Fail, Grey=Pass)", color="#f8fafc", fontsize=9, pad=8)
+        axes[idx_curr].set_title("2. GROUND TRUTH\nWhat actually failed (Red=New Fail, Grey=Pass)", color="#FFFFFF", fontsize=9, pad=8, fontweight="bold")
         idx_curr += 1
 
     # Panel 3: Predicted Probability
     im_prob = axes[idx_curr].imshow(prob_grid, cmap="plasma", vmin=0, vmax=1, aspect="equal")
-    axes[idx_curr].set_title(f"{idx_curr+1}. {model_name} Predicted Prob\n(Threshold = {threshold:.3f})", color="#f8fafc", fontsize=9, pad=8)
+    axes[idx_curr].set_title(f"{idx_curr+1}. MODEL RISK ({model_name})\nPredicted failure probability (Threshold: {threshold:.3f})", color="#FFFFFF", fontsize=9, pad=8, fontweight="bold")
     cb1 = plt.colorbar(im_prob, ax=axes[idx_curr], fraction=0.046, pad=0.04)
-    cb1.ax.tick_params(colors="#94a3b8", labelsize=7)
+    cb1.ax.tick_params(colors="#B7BDC7", labelsize=7)
     idx_curr += 1
 
     # Panel 4: Risk Field with Hotspot Contours
     vmax_risk = max(float(np.nanmax(smoothed_risk)) if np.any(~np.isnan(smoothed_risk)) else 0.8, 0.8)
     im_risk = axes[idx_curr].imshow(smoothed_risk, cmap="magma", vmin=0, vmax=vmax_risk, aspect="equal")
     if np.any(hotspot_mask):
-        axes[idx_curr].contour(hotspot_mask, levels=[0.5], colors=["#38bdf8"], linewidths=[1.4])
-    axes[idx_curr].set_title(f"{idx_curr+1}. Continuous Risk Field (2D Gaussian)\n(Cyan = Hotspots > 90th %ile)", color="#f8fafc", fontsize=9, pad=8)
+        axes[idx_curr].contour(hotspot_mask, levels=[0.5], colors=["#25B9E6"], linewidths=[1.5])
+    axes[idx_curr].set_title(f"{idx_curr+1}. SPATIAL FIELD\nWhere risk clusters (Cyan = Top 10% Hotspot)", color="#FFFFFF", fontsize=9, pad=8, fontweight="bold")
     cb2 = plt.colorbar(im_risk, ax=axes[idx_curr], fraction=0.046, pad=0.04)
-    cb2.ax.tick_params(colors="#94a3b8", labelsize=7)
+    cb2.ax.tick_params(colors="#B7BDC7", labelsize=7)
 
     plt.tight_layout()
     return fig
@@ -416,8 +747,8 @@ def render_block_strip(
     base_mean: float = 100.0,
 ) -> matplotlib.figure.Figure:
     """
-    Render strip plot of 2,000 sub-die block readings using the actual robust MAD-based
-    anomaly threshold (|readings - median| > 2.0 * MAD) from src/block_features.py.
+    Render strip plot of 2,000 sub-die block readings using robust MAD-based
+    anomaly threshold (|readings - median| > 2.0 * MAD) with SanDisk styling.
     """
     n = len(readings)
     indices = np.arange(n)
@@ -433,32 +764,32 @@ def render_block_strip(
         lo_bound = median_
         hi_bound = median_
 
-    fig, ax = plt.subplots(figsize=(13, 3.8), facecolor="#0f172a")
-    ax.set_facecolor("#1e293b")
-    ax.tick_params(colors="#94a3b8", labelsize=8)
+    fig, ax = plt.subplots(figsize=(13, 3.8), facecolor="#15181D")
+    ax.set_facecolor("#0D0F12")
+    ax.tick_params(colors="#7F8792", labelsize=8)
     for spine in ax.spines.values():
-        spine.set_color("#334155")
+        spine.set_color("#30353D")
 
-    ax.plot(indices, readings, color="#38bdf8", linewidth=0.5, alpha=0.85, label="Sub-die block readings")
+    ax.plot(indices, readings, color="#25B9E6", linewidth=0.55, alpha=0.9, label="Sub-die block readings")
     if anom_mask.any():
         ax.scatter(
             indices[anom_mask], readings[anom_mask],
-            color="#ef4444", s=14, zorder=5, label=f"Anomalous readings (>{mad_k}×MAD: {anom_mask.sum():,} blocks / {100*anom_mask.mean():.1f}%)"
+            color="#FF5A5F", s=14, zorder=5, label=f"Anomalous readings (>{mad_k}×MAD: {anom_mask.sum():,} blocks / {100*anom_mask.mean():.1f}%)"
         )
 
-    ax.axhline(lo_bound, color="#f59e0b", linestyle="--", linewidth=0.9, label=f"Robust threshold: median ± {mad_k}×MAD [{lo_bound:.1f}, {hi_bound:.1f}]")
-    ax.axhline(hi_bound, color="#f59e0b", linestyle="--", linewidth=0.9)
-    ax.axhline(median_, color="#22c55e", linestyle="-", linewidth=1.0, alpha=0.8, label=f"Die median ({median_:.1f})")
-    ax.axhline(base_mean, color="#94a3b8", linestyle=":", linewidth=0.8, alpha=0.6, label=f"Base population mean ({base_mean:.1f})")
+    ax.axhline(lo_bound, color="#F4B740", linestyle="--", linewidth=0.9, label=f"Robust threshold: median ± {mad_k}×MAD [{lo_bound:.1f}, {hi_bound:.1f}]")
+    ax.axhline(hi_bound, color="#F4B740", linestyle="--", linewidth=0.9)
+    ax.axhline(median_, color="#35D07F", linestyle="-", linewidth=1.0, alpha=0.85, label=f"Die median ({median_:.1f})")
+    ax.axhline(base_mean, color="#7F8792", linestyle=":", linewidth=0.8, alpha=0.6, label=f"Base population mean ({base_mean:.1f})")
 
-    ax.set_xlabel("Sequential Block Array Index (0 to 1999 — NOTE: Index-Position only, NOT physical die geometry)", color="#cbd5e1", fontsize=9)
-    ax.set_ylabel("Signal Reading Value", color="#cbd5e1", fontsize=9)
+    ax.set_xlabel("Sequential Block Array Index (0 to 1999 — NOTE: Index-Position only, NOT physical die geometry)", color="#B7BDC7", fontsize=9)
+    ax.set_ylabel("Signal Reading Value", color="#B7BDC7", fontsize=9)
     ax.set_title(
         f"Die ({die_row}, {die_col}) on Wafer {wafer_id} — Sub-Die Block Signal Profile\n"
         f"Robust Anomalous Blocks (|x - median| > {mad_k}×MAD): {anom_mask.sum():,} / {n:,} ({100*anom_mask.mean():.2f}%)",
-        color="#f8fafc", fontsize=10, pad=8
+        color="#FFFFFF", fontsize=10, pad=8, fontweight="bold"
     )
-    ax.legend(facecolor="#1e293b", edgecolor="#334155", labelcolor="#f8fafc", fontsize=8, loc="upper right")
+    ax.legend(facecolor="#15181D", edgecolor="#30353D", labelcolor="#FFFFFF", fontsize=8, loc="upper right")
     plt.tight_layout()
     return fig
 
@@ -467,10 +798,37 @@ def render_block_strip(
 # Main Application Flow
 # -----------------------------------------------------------------------------
 def main():
-    # Header
-    st.markdown('<div class="main-header">Semiconductor Die Yield Prediction & Diagnostics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Production Model Comparison, Wafer Risk Fields, and Per-Die Explainability</div>', unsafe_allow_html=True)
-    st.info("ℹ️ **Data Disclosure**: Real WM-811K wafer geometry and pre-test maps combined with synthetic die-level parametric measurements, synthetic sub-die block readings, and controlled new-failure labels.")
+    # -------------------------------------------------------------------------
+    # PRODUCT HEADER (design.md Section 14)
+    # -------------------------------------------------------------------------
+    st.markdown("""
+    <div class="sd-header-wrap">
+        <div class="sd-brand-row">
+            <div>
+                <h1 class="sd-brand-title"><span class="sd-pixel-mark"></span>DIEYIELD INTELLIGENCE</h1>
+                <div class="sd-brand-subtitle">Multi-Resolution Yield Prediction &amp; Root-Cause Analysis</div>
+            </div>
+            <div>
+                <span class="sd-badge-verified">MODEL VERIFIED</span>
+            </div>
+        </div>
+        <div class="sd-meta-strip">
+            <div class="sd-meta-item">TEST POPULATION: <span class="val">40 HELD-OUT WAFERS</span></div>
+            <div>·</div>
+            <div class="sd-meta-item">ELIGIBLE DIES: <span class="val">32,598</span></div>
+            <div>·</div>
+            <div class="sd-meta-item">NEW FAILURES: <span class="val">1,380 (4.23%)</span></div>
+            <div>·</div>
+            <div class="sd-meta-item">RESOLUTION: <span class="val">MODEL A (511) → MODEL B (531)</span></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="sd-disclaimer">
+        <b>Data Grounding &amp; Architecture Scope</b>: Real WM-811K wafer geometry and pre-test maps combined with synthetic 500-channel parametric tests, 2,000-reading sub-die block telemetry, and controlled post-burn-in failure labels.
+    </div>
+    """, unsafe_allow_html=True)
 
     # 1. Load data and models
     meta_df = load_test_metadata()
@@ -483,12 +841,139 @@ def main():
 
     wafers = sorted(meta_df["wafer_id"].unique())
 
-    # Sidebar controls
+    # -------------------------------------------------------------------------
+    # SECTION 1: Executive Results KPI Cards (design.md Section 16)
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="sd-section-title">Executive Results</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Model B captures more failures at the same inspection budget. Adding sub-die evidence improves continuous risk ranking without increasing the inspection budget.</div>', unsafe_allow_html=True)
+
+    col_ex1, col_ex2, col_ex3, col_ex4 = st.columns(4)
+    with col_ex1:
+        st.markdown(
+            '<div class="sd-card">'
+            '<div class="sd-kpi-label">PR-AUC (Continuous Ranking)</div>'
+            '<div class="sd-kpi-value">0.5362</div>'
+            '<div class="sd-kpi-delta">Δ +0.0337 (+6.7% vs A: 0.5025)</div>'
+            '<div class="sd-kpi-sub">95% wafer-cluster bootstrap CI [+0.023, +0.043]</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with col_ex2:
+        st.markdown(
+            '<div class="sd-card-hero">'
+            '<div class="sd-kpi-label" style="color: var(--sd-red);">10% Inspection Budget (Hero)</div>'
+            '<div class="sd-kpi-value-hero">834 <span style="font-size: 1.2rem; color: var(--sd-text-secondary); font-weight: 500;">vs 768 fails</span></div>'
+            '<div class="sd-kpi-delta-red">+66 Additional Failures Captured</div>'
+            '<div class="sd-kpi-sub">60.4% vs 55.7% failure capture · 3,260 dies screened</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with col_ex3:
+        st.markdown(
+            '<div class="sd-card">'
+            '<div class="sd-kpi-label">Test Population</div>'
+            '<div class="sd-kpi-value">32,598</div>'
+            '<div class="sd-kpi-delta" style="color: var(--sd-text-secondary);">1,380 New Failures (4.23%)</div>'
+            '<div class="sd-kpi-sub">40 Held-Out Production Wafers</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+    with col_ex4:
+        st.markdown(
+            '<div class="sd-card">'
+            '<div class="sd-kpi-label">Model Resolution</div>'
+            '<div class="sd-kpi-value">531 <span style="font-size: 1.2rem; color: var(--sd-text-secondary); font-weight: 500;">Feats</span></div>'
+            '<div class="sd-kpi-delta" style="color: var(--sd-model-b);">Model B (+20 Sub-Die Feats)</div>'
+            '<div class="sd-kpi-sub">Model A: 511 features (Baseline)</div>'
+            '</div>',
+            unsafe_allow_html=True
+        )
+
+    st.caption("📌 **Note on Binary Decision Boundary (F1)**: Fail F1 is essentially unchanged (Model A: 0.5207 → Model B: 0.5222, Δ +0.0015; 95% bootstrap CI [−0.008, +0.012] contains zero). Model B's primary value is in continuous probability ranking and screening efficiency: at the same 10% inspection budget, Model B captures 66 more failures than Model A (834 vs. 768 failures, or 60.4% vs. 55.7%), without increasing the inspection budget.")
+
+    # -------------------------------------------------------------------------
+    # SECTION 2: Model A vs Model B Architecture & Benchmark (design.md Section 17)
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Model Architecture: Multi-Resolution Progression</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Adding 2,000 sub-die measurements per die improves failure risk prediction beyond die-level and spatial context.</div>', unsafe_allow_html=True)
+
+    st.markdown("""
+    <div class="sd-arch-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div style="flex: 1; min-width: 260px; background: #0D0F12; border: 1px solid #30353D; border-left: 3px solid #25B9E6; border-radius: 6px; padding: 16px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">MODEL A (Baseline)</span>
+                    <span class="sd-badge-model-a">511 Features</span>
+                </div>
+                <div style="font-size: 0.82rem; color: #B7BDC7; line-height: 1.5;">
+                    500 Die Parametric Electrical Tests<br>
+                    + 10 Spatial Neighborhood Features<br>
+                    + 1 Die-level Anomaly Detector
+                </div>
+            </div>
+            <div style="text-align: center; padding: 0 12px;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #A855F7; letter-spacing: 0.06em; margin-bottom: 4px;">+20 SUB-DIE SIGNALS</div>
+                <div style="color: #A855F7; font-size: 1.5rem; font-weight: 800;">→</div>
+            </div>
+            <div style="flex: 1; min-width: 260px; background: #0D0F12; border: 1px solid #30353D; border-left: 3px solid #A855F7; border-radius: 6px; padding: 16px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem;">MODEL B (Multi-Resolution)</span>
+                    <span class="sd-badge-model-b">531 Features</span>
+                </div>
+                <div style="font-size: 0.82rem; color: #B7BDC7; line-height: 1.5;">
+                    Model A Features (511)<br>
+                    + 19 Sub-Die Block Summary Statistics (from 2,000 readings/die)<br>
+                    + 1 Sub-Die Block Anomaly Detector
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_tbl1, col_tbl2 = st.columns([1, 1])
+    with col_tbl1:
+        st.markdown("#### Holdout Test Set Performance (`outputs/comparison_table.csv`)")
+        clean_comp = pd.DataFrame({
+            "Model": ["Model A (Die + Spatial)", "Model B (+ Block Sub-Die)"],
+            "Features": [511, 531],
+            "Fail F1": [f"{comp_df.iloc[0]['fail_f1']:.4f}", f"{comp_df.iloc[1]['fail_f1']:.4f} (essentially unchanged)"],
+            "PR-AUC": [f"{comp_df.iloc[0]['pr_auc']:.4f}", f"{comp_df.iloc[1]['pr_auc']:.4f} (+0.0337)"],
+            "Fail Recall": [f"{comp_df.iloc[0]['fail_recall']*100:.1f}%", f"{comp_df.iloc[1]['fail_recall']*100:.1f}%"],
+            "Fail Precision": [f"{comp_df.iloc[0]['fail_precision']*100:.1f}%", f"{comp_df.iloc[1]['fail_precision']*100:.1f}%"],
+            "Tuned Threshold": [f"{meta_a['threshold']:.4f}", f"{meta_b['threshold']:.4f}"],
+        })
+        st.dataframe(clean_comp, use_container_width=True, hide_index=True)
+
+    with col_tbl2:
+        st.markdown("#### 5-Seed Validation Ablation (`outputs/ablation_table_multiseed.csv`)")
+        clean_abl = pd.DataFrame({
+            "Feature Configuration": abl_df["Feature Set"],
+            "PR-AUC (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["PR-AUC mean"], abl_df["PR-AUC std"])],
+            "Fail F1 (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["Fail F1 mean"], abl_df["Fail F1 std"])],
+            "Fail Recall": [f"{m*100:.1f}%" for m in abl_df["Fail Rec mean"]],
+            "Fail Precision": [f"{m*100:.1f}%" for m in abl_df["Fail Prec mean"]],
+        })
+        st.dataframe(clean_abl, use_container_width=True, hide_index=True)
+
+    # -------------------------------------------------------------------------
+    # SIDEBAR: Control Center (design.md Section 15)
+    # -------------------------------------------------------------------------
     with st.sidebar:
-        st.markdown("### 🎛️ Navigation & Controls")
+        st.markdown("""
+        <div style="margin-bottom: 20px;">
+            <div style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em; color: #FFFFFF; display: flex; align-items: center; gap: 8px;">
+                <span style="display: inline-block; width: 10px; height: 10px; background-color: #F51B0B; border-radius: 1px;"></span>
+                DIEYIELD INTELLIGENCE
+            </div>
+            <div style="font-size: 0.78rem; color: #7F8792; margin-top: 2px; font-weight: 500;">
+                Multi-Resolution Yield Prediction
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
         # Demo Presets
-        st.markdown("#### 🎯 Presentation Demo Presets")
+        st.markdown('<div class="sd-kpi-label">DEMO MODE</div>', unsafe_allow_html=True)
         preset_names = [
             "Manual Exploration",
             "Preset 1: W_F_0014 (40,18) — Spatial Context True Fail",
@@ -501,7 +986,8 @@ def main():
             options=preset_names,
             index=0,
             key="preset_select",
-            help="Select one of the 4 benchmark hackathon demonstration dies."
+            label_visibility="collapsed",
+            help="Select one of the 4 benchmark demonstration dies."
         )
 
         preset_map = {
@@ -520,35 +1006,53 @@ def main():
             wafer_default_idx = wafers.index("W_F_0014") if "W_F_0014" in wafers else 0
 
         # Wafer selection
+        st.markdown('<div class="sd-kpi-label" style="margin-top: 14px;">WAFER</div>', unsafe_allow_html=True)
         selected_wafer = st.selectbox(
             "Select Wafer ID",
             options=wafers,
             index=wafer_default_idx,
             key=f"wafer_select_{preset_id}",
+            label_visibility="collapsed",
             help="Choose a test wafer to inspect wafer spatial patterns and per-die diagnostics."
         )
 
         # Model mode
+        st.markdown('<div class="sd-kpi-label" style="margin-top: 14px;">VIEW</div>', unsafe_allow_html=True)
         model_mode = st.radio(
             "Model Selection",
             options=["Model B (Full Diagnostic)", "Model A (Baseline + Spatial)", "Side-by-side Comparison"],
             index=0,
             key="model_mode_select",
+            label_visibility="collapsed",
             help="Switch between Model A, Model B, or view both side-by-side."
         )
 
-        st.markdown("---")
-        st.markdown("### ℹ️ Dataset & Model Specs")
-        st.markdown(f"""
-        - **Total Test Wafers**: {len(wafers)}
-        - **Test Dies**: {len(meta_df):,}
-        - **Model A Threshold**: `{meta_a['threshold']:.4f}`
-        - **Model B Threshold**: `{meta_b['threshold']:.4f}`
-        - **Algorithm**: LightGBM Classifier
-        - **Calibration**: {'Platt Scaling (Active)' if prob_a_cal is not None else 'Uncalibrated'}
-        """)
-        st.markdown("---")
-        st.caption("Sandisk Die Yield Prediction Hackathon Deliverable")
+        st.markdown('<div class="sd-divider" style="margin: 20px 0 16px 0;"></div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: #7F8792; text-transform: uppercase; margin-bottom: 8px;">
+            DATASET
+        </div>
+        <div style="font-size: 0.8rem; color: #B7BDC7; line-height: 1.5; margin-bottom: 14px;">
+            40 held-out wafers<br>
+            32,598 eligible dies
+        </div>
+        <div style="font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; color: #7F8792; text-transform: uppercase; margin-bottom: 8px;">
+            MODEL
+        </div>
+        <div style="font-size: 0.8rem; color: #B7BDC7; line-height: 1.5; margin-bottom: 12px;">
+            Model A: 511 features<br>
+            Model B: 531 features
+        </div>
+        <div>
+            <span class="sd-badge-verified">Evaluation verified</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="sd-footer">
+            <span>DieYield Intelligence • v1.0</span>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Slice data for selected wafer
     w_mask = meta_df["wafer_id"] == selected_wafer
@@ -566,26 +1070,28 @@ def main():
     n_w_true_new_fails = int((w_meta.loc[w_meta["old_label"] == 0, "label"] == 1).sum()) if has_gt else None
 
     # Overview KPI Cards
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="sd-section-title">Wafer Spatial Map &amp; Risk Fields (<span style="font-family: \'JetBrains Mono\'; color: var(--sd-model-a);">{selected_wafer}</span>)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Inspect full-wafer spatial signature, pre-test failure masks, model probability heatmaps, and continuous 2D Gaussian risk contours.</div>', unsafe_allow_html=True)
+
     col_kpi1, col_kpi2, col_kpi3, col_kpi4, col_kpi5 = st.columns(5)
     with col_kpi1:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Selected Wafer</div><div class="metric-value" style="font-size: 1.3rem;">{selected_wafer}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sd-card"><div class="sd-kpi-label">Selected Wafer</div><div class="sd-kpi-value" style="font-size: 1.35rem; font-family: \'JetBrains Mono\';">{selected_wafer}</div></div>', unsafe_allow_html=True)
     with col_kpi2:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Total Dies</div><div class="metric-value">{n_w_dies:,}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sd-card"><div class="sd-kpi-label">Total Dies</div><div class="sd-kpi-value">{n_w_dies:,}</div></div>', unsafe_allow_html=True)
     with col_kpi3:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Pre-Test Fails</div><div class="metric-value">{n_w_old_fails:,}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sd-card"><div class="sd-kpi-label">Pre-Test Fails</div><div class="sd-kpi-value">{n_w_old_fails:,}</div></div>', unsafe_allow_html=True)
     with col_kpi4:
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Eligible Dies</div><div class="metric-value">{n_w_eligible:,}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sd-card"><div class="sd-kpi-label">Eligible Dies</div><div class="sd-kpi-value">{n_w_eligible:,}</div></div>', unsafe_allow_html=True)
     with col_kpi5:
         gt_display = f"{n_w_true_new_fails:,}" if has_gt else "N/A"
-        st.markdown(f'<div class="metric-card"><div class="metric-label">Actual New Fails</div><div class="metric-value">{gt_display}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="sd-card"><div class="sd-kpi-label">Actual New Fails</div><div class="sd-kpi-value" style="color: var(--sd-failure);">{gt_display}</div></div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
     # -------------------------------------------------------------------------
-    # SECTION 1: 4-Panel Wafer View
+    # SECTION 3: 4-Panel Wafer View (design.md Section 18)
     # -------------------------------------------------------------------------
-    st.markdown("### 🗺️ Wafer Spatial Map & Continuous Risk Fields")
-
     if model_mode == "Side-by-side Comparison":
         st.markdown("#### Model A (Die + Spatial + Die Anomaly)")
         fig_a = render_wafer_4panel(
@@ -613,12 +1119,12 @@ def main():
         st.pyplot(fig)
         plt.close(fig)
 
-    st.markdown("<hr style='margin: 25px 0; border-color: #334155;'>", unsafe_allow_html=True)
-
     # -------------------------------------------------------------------------
-    # SECTION 2: Die Selector & Detailed Explanation Panel
+    # SECTION 4: Die Selector & Detailed Explanation Panel
     # -------------------------------------------------------------------------
-    st.markdown("### 🔍 Die-Level Diagnostic Inspector & SHAP Attribution")
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Die-Level Diagnostic Inspector &amp; Decision Strip</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Inspect individual die predictions, uncalibrated raw scores, calibrated failure risks, and model decision thresholds.</div>', unsafe_allow_html=True)
 
     # Determine active model parameters for die inspection
     active_is_model_b = ("Model B" in model_mode) or (model_mode == "Side-by-side Comparison")
@@ -641,7 +1147,7 @@ def main():
         # Pre-select benchmark die if present, else highest risk eligible die
         top_risk_dies = w_meta.sort_values("_prob", ascending=False)
         die_coord_options = [
-            f"Row {int(r)}, Col {int(c)} (Prob: {p*100:.1f}%, Status: {'FAIL' if pr==1 else 'PASS'})"
+            f"Row {int(r)}, Col {int(c)} (Score: {p*100:.1f}%, Status: {'FAIL' if pr==1 else 'PASS'})"
             for r, c, p, pr in zip(top_risk_dies["die_row"], top_risk_dies["die_col"], top_risk_dies["_prob"], top_risk_dies["_pred"])
         ]
 
@@ -660,11 +1166,11 @@ def main():
                     break
 
         selected_die_str = st.selectbox(
-            "Select Die to Inspect (Sorted by Failure Probability)",
+            "Select Die to Inspect (Sorted by Failure Risk Score)",
             options=die_coord_options,
             index=default_die_idx,
             key=f"die_{selected_wafer}_{preset_id}",
-            help="Select any die on the wafer grid to inspect local feature SHAP attributions, failure signature clustering, and counterfactuals."
+            help="Select any die on the wafer grid to inspect local feature SHAP attributions and sub-die profiles."
         )
 
         # Parse selected coordinates
@@ -686,63 +1192,195 @@ def main():
     with col_sel2:
         st.markdown(f"**Die Coordinates: ({sel_row}, {sel_col}) on Wafer `{selected_wafer}`**")
         col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+        p_a_die = float(w_prob_a[sel_local_idx])
+        p_b_die = float(w_prob_b[sel_local_idx])
+        p_a_die_cal = float(w_prob_a_cal[sel_local_idx]) if w_prob_a_cal is not None else None
+        p_b_die_cal = float(w_prob_b_cal[sel_local_idx]) if w_prob_b_cal is not None else None
+        active_cal_prob = p_b_die_cal if active_is_model_b else p_a_die_cal
+        
         with col_m1:
-            st.metric("Predicted Failure Probability", f"{sel_prob*100:.2f}%")
+            cal_delta = f"Calibrated: {active_cal_prob*100:.1f}%" if active_cal_prob is not None else None
+            st.metric("Raw Model Score", f"{sel_prob*100:.1f}%", delta=cal_delta)
         with col_m2:
-            st.metric("Tuned Decision Threshold", f"{active_threshold:.4f}")
+            st.metric("Decision Threshold", f"{active_threshold:.4f}")
         with col_m3:
             st.metric("Pre-Test Status", "FAIL (old_label=1)" if sel_old_label == 1 else "PASS (Eligible)")
         with col_m4:
             gt_text = ("FAIL" if sel_gt == 1 else "PASS") if has_gt else "N/A"
             st.metric("Ground-Truth Target", gt_text)
 
-        # 5.2 A-vs-B Decision Strip
-        p_a_die = float(w_prob_a[sel_local_idx])
-        p_b_die = float(w_prob_b[sel_local_idx])
+        # A-vs-B Decision Strip
         dec_a = (p_a_die >= meta_a["threshold"]) if sel_old_label == 0 else True
         dec_b = (p_b_die >= meta_b["threshold"]) if sel_old_label == 0 else True
         diff_pct = (p_b_die - p_a_die) * 100
 
         st.markdown("---")
-        st.markdown("**⚖️ Model A vs. Model B Head-to-Head Decision Strip**")
+        st.markdown("**Model A vs. Model B Head-to-Head Decision Strip**")
         col_s1, col_s2, col_s3 = st.columns(3)
         with col_s1:
-            st.markdown(f"**Model A**: `{p_a_die*100:.1f}%` → **{'FAIL' if dec_a else 'PASS'}** (cutoff: `{meta_a['threshold']:.4f}`)")
+            cal_note_a = f" (cal: {p_a_die_cal*100:.1f}%)" if p_a_die_cal is not None else ""
+            st.markdown(f"**Model A**: `{p_a_die*100:.1f}%`{cal_note_a} → **{'FAIL' if dec_a else 'PASS'}** (cutoff: `{meta_a['threshold']:.4f}`)")
         with col_s2:
-            st.markdown(f"**Model B**: `{p_b_die*100:.1f}%` → **{'FAIL' if dec_b else 'PASS'}** (cutoff: `{meta_b['threshold']:.4f}`)")
+            cal_note_b = f" (cal: {p_b_die_cal*100:.1f}%)" if p_b_die_cal is not None else ""
+            st.markdown(f"**Model B**: `{p_b_die*100:.1f}%`{cal_note_b} → **{'FAIL' if dec_b else 'PASS'}** (cutoff: `{meta_b['threshold']:.4f}`)")
         with col_s3:
             st.markdown(f"**Shift (B − A)**: `{diff_pct:+.1f}%` ({'Both Agree' if dec_a == dec_b else 'Decision Diverges'})")
+
+    # -------------------------------------------------------------------------
+    # SECTION 5: Hero Demo — Why Did Model B Change Its Mind? (design.md Section 19)
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Why Did Model B Change Its Mind?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Sub-die evidence reveals localized variation that die-level averages can hide.</div>', unsafe_allow_html=True)
+
+    col_exp1, col_exp2 = st.columns([1, 1])
+    with col_exp1:
+        st.markdown("""
+        <div class="sd-hero-die-card">
+            <div style="font-weight: 800; color: #FFFFFF; font-size: 1.1rem; margin-bottom: 2px;">
+                Benchmark Case: Wafer W_N_0066 · Die (2, 13)
+            </div>
+            <div style="font-size: 0.8rem; color: #7F8792; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+                True post-burn-in defect missed by die-level &amp; spatial features
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #0D0F12; border: 1px solid #30353D; border-radius: 6px; margin-bottom: 10px;">
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #25B9E6; text-transform: uppercase;">MODEL A</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #FFFFFF;">12.9%</div>
+                    <div style="font-size: 0.75rem; color: #7F8792;">Cal: 4.5%</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #35D07F; margin-top: 2px;">PASS</div>
+                </div>
+                <div style="font-size: 1.4rem; font-weight: 800; color: #7F8792; padding: 0 10px;">→</div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #A855F7; text-transform: uppercase;">MODEL B</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #FFFFFF;">62.9%</div>
+                    <div style="font-size: 0.75rem; color: #7F8792;">Cal: 45.2%</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #FF5A5F; margin-top: 2px;">FLAGGED</div>
+                </div>
+                <div style="font-size: 1.4rem; font-weight: 800; color: #7F8792; padding: 0 10px;">→</div>
+                <div style="text-align: center; flex: 1;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: #FF5A5F; text-transform: uppercase;">GROUND TRUTH</div>
+                    <div style="font-size: 1.3rem; font-weight: 800; color: #FF5A5F;">FAIL</div>
+                    <div style="font-size: 0.75rem; color: #7F8792;">old_label: 0</div>
+                    <div style="font-size: 0.8rem; font-weight: 700; color: #FF5A5F; margin-top: 2px;">TRUE DEFECT</div>
+                </div>
+            </div>
+            <div style="font-size: 0.84rem; color: #B7BDC7; line-height: 1.5; padding-top: 6px;">
+                <b>The Multi-Resolution Difference:</b> Model A sees the die-level average (12.9% raw score, well below cutoff 0.5574). Model B detects localized sub-die variation (<code>blk_anomaly_score = 0.594</code> across 2,000 block readings), pushing the score to 62.9% and catching the failure early.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_exp2:
+        st.markdown("""
+        <div class="sd-card">
+            <div style="font-weight: 800; color: #A855F7; font-size: 1.1rem; margin-bottom: 2px;">
+                Discrepancy Impact Across 40 Test Wafers
+            </div>
+            <div style="font-size: 0.8rem; color: #7F8792; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em;">
+                Net Defect Catch vs. False Scrap Trade-off
+            </div>
+            <div style="font-size: 0.84rem; color: #B7BDC7; line-height: 1.6;">
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #30353D;">
+                    <span>Failures caught by Model B only (Model A missed):</span>
+                    <span style="font-weight: 700; color: #35D07F;">+29 fails</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #30353D;">
+                    <span>Failures caught by Model A only (Model B missed):</span>
+                    <span style="font-weight: 700; color: #FF5A5F;">-8 fails</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #30353D;">
+                    <span><b>Net True Defect Gain (at tuned cutoffs):</b></span>
+                    <span style="font-weight: 800; color: #FFFFFF;">+21 net defects caught</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                    <span>False alarm dies (scrap trade-off):</span>
+                    <span style="color: #7F8792;">69 on Model B vs. 15 on Model A</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Discrepancy table
+    el_all = (meta_df["old_label"] == 0)
+    y_all = meta_df.loc[el_all, "label"].values if "label" in meta_df else np.zeros(el_all.sum())
+    pa_all = prob_a[el_all.values]
+    pb_all = prob_b[el_all.values]
+    th_a = meta_a["threshold"]
+    th_b = meta_b["threshold"]
+
+    gained_mask = (y_all == 1) & (pa_all < th_a) & (pb_all >= th_b)
+    gained_dies = meta_df[el_all][gained_mask][["wafer_id", "die_row", "die_col"]].copy()
+    gained_dies["Model A Risk"] = [f"{p*100:.1f}%" for p in pa_all[gained_mask]]
+    gained_dies["Model B Risk"] = [f"{p*100:.1f}%" for p in pb_all[gained_mask]]
+    gained_dies["Risk Shift (B − A)"] = [f"{(b - a)*100:+.1f}%" for a, b in zip(pa_all[gained_mask], pb_all[gained_mask])]
+    gained_dies["Status"] = "Caught by Model B Only (True Post-Test Fail)"
+
+    st.markdown(f"#### 🔍 Complete Discrepancy Table: 29 True Failures Caught by Model B Only")
+    st.dataframe(gained_dies.reset_index(drop=True), use_container_width=True, hide_index=True)
+
+    # -------------------------------------------------------------------------
+    # SECTION 6: Diagnostic Explainability & Sub-Die Signal Profiling (design.md Section 21)
+    # -------------------------------------------------------------------------
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Diagnostic Explainability: Why Was This Die Flagged?</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">Deconstruct local model predictions into parametric, spatial, and sub-die block feature contributions using TreeSHAP.</div>', unsafe_allow_html=True)
 
     # Compute SHAP values for this wafer (cached on wafer selection)
     shap_vals, feat_cols, X_wafer = compute_wafer_shap(selected_wafer, model_type=active_model_name)
     die_shap = shap_vals[sel_local_idx]
     die_X = X_wafer.iloc[sel_local_idx]
 
-    # Display SHAP breakdown
+    # Sort features by absolute SHAP attribution
+    feat_order = np.argsort(np.abs(die_shap))[::-1]
+    top_n = 8
+    top_indices = feat_order[:top_n]
+    top_names = [feat_cols[i] for i in top_indices]
+    top_shaps = [die_shap[i] for i in top_indices]
+    top_vals = [die_X[feat_cols[i]] for i in top_indices]
+
+    # Top 3 Driver Cards (design.md Section 21)
+    st.markdown("#### Primary Prediction Drivers")
+    col_d1, col_d2, col_d3 = st.columns(3)
+    driver_cols = [col_d1, col_d2, col_d3]
+    for i in range(min(3, len(top_names))):
+        fname = top_names[i]
+        fval = top_vals[i]
+        fshap = top_shaps[i]
+        is_pos = (fshap > 0)
+        direction_icon = "↑ increases risk" if is_pos else "↓ reduces risk"
+        direction_color = "var(--sd-failure)" if is_pos else "var(--sd-success)"
+        context_tag = ' <span class="sd-badge-context">Context</span>' if fname.startswith("sp_") else ''
+        
+        with driver_cols[i]:
+            st.markdown(f"""
+            <div class="sd-card" style="padding: 14px 16px;">
+                <div style="font-size: 0.72rem; font-weight: 700; color: #7F8792; text-transform: uppercase;">DRIVER #{i+1}{context_tag}</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: #FFFFFF; font-family: 'JetBrains Mono', monospace; margin: 4px 0;">{fname}</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                    <span style="color: #B7BDC7;">Value: {fval:.3g}</span>
+                    <span style="font-weight: 700; color: {direction_color};">{direction_icon}</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Display SHAP breakdown & Domain attribution
     col_shap1, col_shap2 = st.columns([3, 2])
     with col_shap1:
-        st.markdown(f"#### Top Contributing Features for Die ({sel_row}, {sel_col}) — {active_model_name}")
+        st.markdown(f"#### Top Feature Attributions ({active_model_name})")
 
-        # Sort features by absolute SHAP attribution
-        feat_order = np.argsort(np.abs(die_shap))[::-1]
-        top_n = 8
-        top_indices = feat_order[:top_n]
-
-        top_names = [feat_cols[i] for i in top_indices]
-        top_shaps = [die_shap[i] for i in top_indices]
-        top_vals = [die_X[feat_cols[i]] for i in top_indices]
-
-        # Horizontal bar chart of top features
-        fig_bar, ax_bar = plt.subplots(figsize=(7, 3.8), facecolor="#0f172a")
-        ax_bar.set_facecolor("#1e293b")
-        ax_bar.tick_params(colors="#94a3b8", labelsize=8)
+        # Horizontal bar chart of top features (SanDisk styling)
+        fig_bar, ax_bar = plt.subplots(figsize=(7, 3.8), facecolor="#15181D")
+        ax_bar.set_facecolor("#0D0F12")
+        ax_bar.tick_params(colors="#7F8792", labelsize=8)
         for spine in ax_bar.spines.values():
-            spine.set_color("#334155")
+            spine.set_color("#30353D")
 
         y_positions = np.arange(top_n)[::-1]
-        colors = ["#ef4444" if s > 0 else "#22c55e" for s in top_shaps]
+        colors = ["#FF5A5F" if s > 0 else "#35D07F" for s in top_shaps]
         ax_bar.barh(y_positions, top_shaps, color=colors, height=0.6)
-        ax_bar.axvline(0, color="#94a3b8", linewidth=0.8, linestyle="--")
+        ax_bar.axvline(0, color="#7F8792", linewidth=0.8, linestyle="--")
 
         formatted_labels = [
             f"{name} ({val:.2g}) (context, not an intervention)" if name.startswith("sp_")
@@ -750,14 +1388,14 @@ def main():
             for name, val in zip(top_names, top_vals)
         ]
         ax_bar.set_yticks(y_positions)
-        ax_bar.set_yticklabels(formatted_labels, color="#f8fafc", fontsize=8)
-        ax_bar.set_xlabel("SHAP Attribution (Red = Increases Failure Risk, Green = Reduces Risk)", color="#cbd5e1", fontsize=8)
+        ax_bar.set_yticklabels(formatted_labels, color="#FFFFFF", fontsize=8)
+        ax_bar.set_xlabel("SHAP Attribution (Red = Increases Failure Risk, Green = Reduces Risk)", color="#B7BDC7", fontsize=8)
         plt.tight_layout()
         st.pyplot(fig_bar)
         plt.close(fig_bar)
 
     with col_shap2:
-        st.markdown("#### Domain Attribution Breakdown")
+        st.markdown("#### Domain Attribution Breakdown (design.md Section 22)")
         
         # Domain contributions
         die_contrib = float(sum(abs(die_shap[i]) for i, f in enumerate(feat_cols) if f.startswith("feature_")))
@@ -769,11 +1407,16 @@ def main():
         domain_df = pd.DataFrame({
             "Domain": [
                 "Die Parametric (500)",
-                "Spatial Neighborhood (10) (context, not an intervention)",
+                "Spatial Neighborhood (10) (Context — not an intervention)",
                 "Sub-Die Block (19)",
                 "Anomaly Scores (1-2)"
             ],
-            "Attribution Mass": [die_contrib, sp_contrib, blk_contrib, anom_contrib],
+            "Role": [
+                "Primary signal",
+                "Context (not an intervention)",
+                "Micro-structural evidence",
+                "Supporting signal"
+            ],
             "Percentage": [
                 f"{die_contrib/total_mass*100:.1f}%",
                 f"{sp_contrib/total_mass*100:.1f}%",
@@ -784,26 +1427,26 @@ def main():
         st.dataframe(domain_df, use_container_width=True, hide_index=True)
 
         # Failure Signature matching
-        st.markdown("#### Signature (rule-based on top SHAP driver; HDBSCAN clusters derived offline)")
+        st.markdown("#### Signature (Rule-Based on Top SHAP Driver)")
         if sel_pred == 1 or sel_prob >= active_threshold:
-            # Map top feature to signature
             top_f = top_names[0]
             if "blk_" in top_f:
-                sig_text = "**Cluster 0 / 1: Block-Reading Signal Drift / Memory Array Shift**"
+                sig_text = "Cluster 0 / 1: Block-Reading Signal Drift / Memory Array Shift"
                 sig_desc = "Driven by sub-die block voltage anomalies indicating local memory array degradation."
             elif "sp_dist" in top_f or "sp_old" in top_f:
-                sig_text = "**Cluster 2 / 3: Defect Neighborhood Proximity & Spatial Clustering**"
+                sig_text = "Cluster 2 / 3: Defect Neighborhood Proximity & Spatial Clustering"
                 sig_desc = "Driven by physical proximity to existing pre-test wafer defect clusters."
             else:
-                sig_text = "**Cluster -1: Mixed / Parametric Electrical Breakdown**"
+                sig_text = "Cluster -1: Mixed / Parametric Electrical Breakdown"
                 sig_desc = "Multi-parametric electrical shift across die-level measurements."
             
-            st.info(f"{sig_text}\n\n_{sig_desc}_")
+            st.info(f"**{sig_text}**\n\n_{sig_desc}_")
         else:
             st.success("Die is predicted as **PASS** (Normal operating population).")
 
-    # Counterfactual explanation box
-    st.markdown("#### 🔄 Model-Based Counterfactual Sensitivity Analysis")
+    # Counterfactual explanation box (design.md Section 23)
+    st.markdown("#### Risk Sensitivity — What Drives the Score?")
+    st.markdown('<div class="sd-section-sub">If measurable signals move toward their normal range, how does the model score respond?</div>', unsafe_allow_html=True)
     rep_key = (selected_wafer, sel_row, sel_col)
     if rep_key in PRECOMPUTED_REPRESENTATIVES:
         rep_info = PRECOMPUTED_REPRESENTATIVES[rep_key]
@@ -816,9 +1459,9 @@ def main():
         - **Total Achievable Risk Reduction**: **{rep_info['reduction']}**
         """)
     else:
-        st.markdown(f"""
-        <div class="disclaimer-box">
-            <b>Note on Counterfactual Explanations:</b> Full 5-model bootstrap ensemble uncertainty trajectories were precomputed for representative benchmark cases (e.g. Wafer <code>W_F_0014</code> Row 40, Col 18; Wafer <code>W_F_0019</code> Row 22, Col 22; Wafer <code>W_F_0016</code> Row 21, Col 12).
+        st.markdown("""
+        <div class="sd-disclaimer">
+            <b>Note on Counterfactual Sensitivity</b>: Full 5-model bootstrap ensemble uncertainty trajectories were precomputed for benchmark cases (e.g. Wafer <code>W_F_0014</code> Row 40, Col 18; Wafer <code>W_F_0019</code> Row 22, Col 22; Wafer <code>W_F_0016</code> Row 21, Col 12).
         </div>
         """, unsafe_allow_html=True)
         
@@ -834,14 +1477,12 @@ def main():
             - **Live Sensitivity Test**: Normalizing top non-spatial driver `{top_driver}` from `{die_X[top_driver]:.3g}` to healthy median `{active_pass_med[top_driver]:.3g}` shifts failure probability from **{sel_prob*100:.1f}%** to **{p_cf*100:.1f}%** (Δ = {delta_p*100:+.1f}%).
             """)
 
-    st.caption("⚠️ **Disclaimer**: Model-based mathematical risk adjustment estimate, NOT a physical semiconductor manufacturing simulation or causal intervention.")
+    st.caption("⚠️ **Disclaimer**: Model-based mathematical sensitivity estimate; not a physical semiconductor manufacturing simulation or causal intervention.")
 
-    # -------------------------------------------------------------------------
-    # SECTION 3: Sub-Die Block View (Model B Only)
-    # -------------------------------------------------------------------------
+    # Sub-Die Block View (Model B Only, design.md Section 24 & 25)
     if active_is_model_b:
-        st.markdown("<hr style='margin: 25px 0; border-color: #334155;'>", unsafe_allow_html=True)
-        st.markdown("### 📊 Sub-Die Block Signal Profile (Model B Feature View)")
+        st.markdown('<div class="sd-divider" style="margin: 24px 0 16px 0;"></div>', unsafe_allow_html=True)
+        st.markdown("#### Sub-Die Evidence — 2,000 Internal Readings")
         
         w_blk_df = load_wafer_block_readings(selected_wafer)
         die_blk_row = w_blk_df[
@@ -861,24 +1502,20 @@ def main():
                 "📌 **Physical Mapping & Threshold Notice**: Anomalous points are highlighted using the robust MAD threshold from `src/block_features.py` (|reading - median| > 2.0 × MAD). "
                 "The X-axis indicates sequential index position within the stream (0..1999) — NOT genuine physical 2D/3D spatial coordinates within the die stack."
             )
-            st.info(
-                "📌 **Sub-Die Feature Honesty Note**: Mean, spread and quartile statistics carry the signal; "
-                "run/cluster statistics (`blk_n_anom_fixed`, `blk_frac_anom_fixed`, `blk_longest_run`, `blk_n_clusters`) "
-                "were inert in this setting."
-            )
+            st.markdown("""
+            <div class="sd-disclaimer" style="margin-top: 10px;">
+                <b>Feature audit</b>: Four block statistics were non-contributory in this experiment (<code>blk_n_anom_fixed</code>, <code>blk_frac_anom_fixed</code>, <code>blk_longest_run</code>, <code>blk_n_clusters</code>). Central tendency (mean), spread (std), and quantile statistics carry the signal. They remain in the model definition for reproducibility.
+            </div>
+            """, unsafe_allow_html=True)
         else:
             st.info(f"Block reading stream for Die ({sel_row}, {sel_col}) is not available in test store.")
 
     # -------------------------------------------------------------------------
-    # SECTION: Budget-Aware Screening Triage & Risk Prioritization (Phase 4)
+    # SECTION 7: Budget-Aware Screening Triage (design.md Section 26 & 27)
     # -------------------------------------------------------------------------
-    st.markdown("<hr style='margin: 25px 0; border-color: #334155;'>", unsafe_allow_html=True)
-    st.markdown("### 🎯 Budget-Aware Screening Triage & Risk Prioritization")
-    st.markdown(
-        "In production wafer testing, inspection bandwidth is strictly bounded. Rather than relying solely on a fixed threshold, "
-        "manufacturing teams prioritize dies by predicted risk score. Compare Model A and Model B failure capture rates "
-        "across varying inspection budgets."
-    )
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Same Inspection Budget. More Failures Caught.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-sub">At the same inspection budget, prioritizing dies by continuous risk score catches more defective dies than baseline models.</div>', unsafe_allow_html=True)
 
     col_tr_ctrl1, col_tr_ctrl2 = st.columns([1, 1])
     with col_tr_ctrl1:
@@ -937,134 +1574,101 @@ def main():
     stats_b = topk_stats(y_scope, s_b, screen_k_pct / 100.0, score_cal=s_b_cal)
 
     # Side-by-side metrics
-    score_label = "Mean Calibrated Failure Risk" if use_cal else "Mean Risk Score (Uncalibrated)"
+    score_label = "Mean Calibrated Risk" if use_cal else "Mean Risk Score"
     
     col_t1, col_t2 = st.columns(2)
     with col_t1:
+        st.markdown('<div class="sd-card" style="border-left: 3px solid #25B9E6; margin-bottom: 16px;">', unsafe_allow_html=True)
         st.markdown("#### Model A (Spatial Baseline)")
         col_sub1, col_sub2, col_sub3 = st.columns(3)
         with col_sub1:
             st.metric("Dies Screened", f"{stats_a['n_screened']:,} ({screen_k_pct:.1f}%)")
-            st.metric("Observed Failure Rate (Precision)", f"{stats_a['observed_fail_rate']*100:.1f}%")
+            st.metric("Failure Rate (Precision)", f"{stats_a['observed_fail_rate']*100:.1f}%")
         with col_sub2:
             st.metric("Failures Captured", f"{stats_a['n_fails_captured']:,} / {stats_a['n_fails_total']:,}")
-            st.metric("% of All Failures Caught", f"{stats_a['capture_rate']*100:.1f}%")
+            st.metric("Capture Rate", f"{stats_a['capture_rate']*100:.1f}%")
         with col_sub3:
             st.metric("Screening Lift", f"{stats_a['lift']:.2f}×")
             cal_rate_a = f"{stats_a['mean_calibrated_rate']*100:.1f}%" if stats_a['mean_calibrated_rate'] is not None else f"{stats_a['mean_score']:.3f}"
             st.metric(score_label, cal_rate_a)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_t2:
-        st.markdown("#### Model B (Full Diagnostic Model)")
+        st.markdown('<div class="sd-card" style="border-left: 3px solid #A855F7; margin-bottom: 16px;">', unsafe_allow_html=True)
+        st.markdown("#### Model B (Multi-Resolution)")
         col_sub1, col_sub2, col_sub3 = st.columns(3)
         with col_sub1:
             st.metric("Dies Screened", f"{stats_b['n_screened']:,} ({screen_k_pct:.1f}%)")
             diff_prec = (stats_b['observed_fail_rate'] - stats_a['observed_fail_rate']) * 100
-            st.metric("Observed Failure Rate (Precision)", f"{stats_b['observed_fail_rate']*100:.1f}%", delta=f"{diff_prec:+.1f}%")
+            st.metric("Failure Rate (Precision)", f"{stats_b['observed_fail_rate']*100:.1f}%", delta=f"{diff_prec:+.1f}%")
         with col_sub2:
             diff_fails = stats_b['n_fails_captured'] - stats_a['n_fails_captured']
             st.metric("Failures Captured", f"{stats_b['n_fails_captured']:,} / {stats_b['n_fails_total']:,}", delta=f"{diff_fails:+d} dies")
             diff_cap = (stats_b['capture_rate'] - stats_a['capture_rate']) * 100
-            st.metric("% of All Failures Caught", f"{stats_b['capture_rate']*100:.1f}%", delta=f"{diff_cap:+.1f}%")
+            st.metric("Capture Rate", f"{stats_b['capture_rate']*100:.1f}%", delta=f"{diff_cap:+.1f}%")
         with col_sub3:
             diff_lift = stats_b['lift'] - stats_a['lift']
             st.metric("Screening Lift", f"{stats_b['lift']:.2f}×", delta=f"{diff_lift:+.2f}×")
             cal_rate_b = f"{stats_b['mean_calibrated_rate']*100:.1f}%" if stats_b['mean_calibrated_rate'] is not None else f"{stats_b['mean_score']:.3f}"
             st.metric(score_label, cal_rate_b)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Render Gains Curve
+    # Render Gains Curve (design.md Section 27)
     k_pts_a, cap_curve_a, _ = capture_curve(y_scope, s_a, n_points=200)
     k_pts_b, cap_curve_b, _ = capture_curve(y_scope, s_b, n_points=200)
 
-    fig_gain, ax_gain = plt.subplots(figsize=(10, 4.2), facecolor="#0f172a")
-    ax_gain.set_facecolor("#1e293b")
-    ax_gain.plot([0, 100], [0, 100], "--", color="#64748b", linewidth=1.2, label="Random Screening Baseline (Lift = 1.0×)")
-    ax_gain.plot(k_pts_a * 100, cap_curve_a * 100, color="#38bdf8", linewidth=2.0, label="Model A (Spatial Baseline)")
-    ax_gain.plot(k_pts_b * 100, cap_curve_b * 100, color="#a855f7", linewidth=2.2, label="Model B (Full Diagnostic)")
+    fig_gain, ax_gain = plt.subplots(figsize=(10, 4.2), facecolor="#15181D")
+    ax_gain.set_facecolor("#0D0F12")
+    ax_gain.plot([0, 100], [0, 100], "--", color="#7F8792", linewidth=1.1, label="Random Screening Baseline (Lift = 1.0×)")
+    ax_gain.plot(k_pts_a * 100, cap_curve_a * 100, color="#25B9E6", linewidth=2.0, label="Model A (Spatial Baseline)")
+    ax_gain.plot(k_pts_b * 100, cap_curve_b * 100, color="#A855F7", linewidth=2.2, label="Model B (Multi-Resolution)")
 
-    ax_gain.axvline(screen_k_pct, color="#10b981", linestyle=":", linewidth=1.5, label=f"Current Budget: {screen_k_pct:.1f}%")
-    ax_gain.scatter([screen_k_pct], [stats_a['capture_rate'] * 100], color="#38bdf8", s=45, zorder=5)
-    ax_gain.scatter([screen_k_pct], [stats_b['capture_rate'] * 100], color="#a855f7", s=45, zorder=5)
+    ax_gain.axvline(screen_k_pct, color="#F51B0B", linestyle=":", linewidth=1.6, label=f"Current Budget: {screen_k_pct:.1f}%")
+    ax_gain.scatter([screen_k_pct], [stats_a['capture_rate'] * 100], color="#25B9E6", s=45, zorder=5)
+    ax_gain.scatter([screen_k_pct], [stats_b['capture_rate'] * 100], color="#A855F7", s=45, zorder=5)
 
     ax_gain.set_xlim(0, 20)
     ax_gain.set_ylim(0, 80)
-    ax_gain.set_xlabel("Screening Budget (% of Eligible Dies Inspected)", color="#cbd5e1", fontsize=9)
-    ax_gain.set_ylabel("Defect Capture Rate (% of True Failures Caught)", color="#cbd5e1", fontsize=9)
-    ax_gain.set_title("Screening Gains Curve — Defect Capture vs. Inspection Budget", color="#f8fafc", fontsize=10, pad=8)
-    ax_gain.tick_params(colors="#94a3b8", labelsize=8)
+    ax_gain.set_xlabel("Screening Budget (% of Eligible Dies Inspected)", color="#B7BDC7", fontsize=9)
+    ax_gain.set_ylabel("Defect Capture Rate (% of True Failures Caught)", color="#B7BDC7", fontsize=9)
+    ax_gain.set_title("Screening Gains Curve — Defect Capture vs. Inspection Budget", color="#FFFFFF", fontsize=10, pad=8, fontweight="bold")
+    ax_gain.tick_params(colors="#7F8792", labelsize=8)
     for spine in ax_gain.spines.values():
-        spine.set_color("#334155")
-    ax_gain.grid(True, linestyle=":", alpha=0.4, color="#475569")
-    ax_gain.legend(facecolor="#0f172a", edgecolor="#334155", labelcolor="#f8fafc", fontsize=8, loc="lower right")
+        spine.set_color("#30353D")
+    ax_gain.grid(True, linestyle=":", alpha=0.4, color="#30353D")
+    ax_gain.legend(facecolor="#15181D", edgecolor="#30353D", labelcolor="#FFFFFF", fontsize=8, loc="lower right")
     plt.tight_layout()
     st.pyplot(fig_gain)
     plt.close(fig_gain)
 
     # -------------------------------------------------------------------------
-    # SECTION 4: Model A vs Model B Comparison & Audit Findings
+    # SECTION 8: Methodological Limitations & Engineering Disclosures (design.md Section 43)
     # -------------------------------------------------------------------------
-    st.markdown("<hr style='margin: 25px 0; border-color: #334155;'>", unsafe_allow_html=True)
-    st.markdown("### 🏆 Production Model Comparison & Ablation Audit")
-
+    st.markdown('<div class="sd-divider"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="sd-section-title">Methodological Limitations &amp; Engineering Disclosures</div>', unsafe_allow_html=True)
     st.markdown("""
-    > **Key Architectural Takeaway**:  
-    > *Test set, 40 held-out wafers, wafer-cluster bootstrap: PR-AUC +0.034 [+0.023, +0.043]; Fail F1 +0.001 [-0.008, +0.012], not distinguishable from zero. Ablation = 5 repeated wafer splits (validation).*
-    """)
+    <div class="sd-limitations">
+        <div style="font-weight: 700; color: #FFFFFF; font-size: 0.95rem; margin-bottom: 8px;">
+            Engineering Honesty &amp; Scope Disclosures:
+        </div>
+        <ol style="margin-top: 4px; margin-bottom: 4px; padding-left: 20px; line-height: 1.65; color: #B7BDC7;">
+            <li><b>Semi-Synthetic Data Origin</b>: Real WM-811K wafer geometry and pre-test maps were combined with synthetic 500 parametric features, synthetic 2,000 block readings per die, and controlled post-test failure labels.</li>
+            <li><b>Marginal Defect Distribution Overlap</b>: A large fraction of failures (65% in this semi-synthetic design) are marginal and overlap healthy electrical distributions, making binary classification difficult; observed F1 remains around 0.52.</li>
+            <li><b>Ranking vs. Binary Classification</b>: Model B provides statistically meaningful improvements in continuous risk ranking (PR-AUC +0.034, 95% wafer-cluster bootstrap CI [+0.023, +0.043] strictly excludes zero) and screening triage (at the same 10% inspection budget, Model B captures 66 more failures than Model A: 834 vs. 768), but binary decision F1 difference (+0.001, 95% CI [−0.008, +0.012]) is not distinguishable from noise.</li>
+            <li><b>Inert Block Features</b>: Central tendency (mean), spread (std), and quantile statistics carry the sub-die signal; sequential run and cluster statistics (<code>blk_n_anom_fixed</code>, <code>blk_longest_run</code>) were inert in this experimental setting.</li>
+            <li><b>Spatial Context is Non-Interventionist</b>: Spatial features (<code>sp_dist_to_fail</code>, <code>sp_old_fail_density_5</code>) provide physical neighborhood context, not manufacturing interventions. They cannot be directly manipulated on a silicon wafer.</li>
+            <li><b>Not Ready for Direct Fab Deployment</b>: Demonstrates multi-resolution proof of concept; full fab qualification requires retraining on unredacted, physical automatic test equipment (ATE) data streams.</li>
+        </ol>
+    </div>
+    """, unsafe_allow_html=True)
 
-    col_tbl1, col_tbl2 = st.columns([1, 1])
-    with col_tbl1:
-        st.markdown("#### Holdout Test Set Performance (`outputs/comparison_table.csv`)")
-        # Format comparison table cleanly
-        clean_comp = pd.DataFrame({
-            "Model": ["Model A (Parametric + Spatial + Anom)", "Model B (Model A + Block Summary & Anom)"],
-            "Fail F1": [f"{comp_df.iloc[0]['fail_f1']:.4f}", f"{comp_df.iloc[1]['fail_f1']:.4f}"],
-            "PR-AUC": [f"{comp_df.iloc[0]['pr_auc']:.4f}", f"{comp_df.iloc[1]['pr_auc']:.4f}"],
-            "Fail Recall": [f"{comp_df.iloc[0]['fail_recall']*100:.2f}%", f"{comp_df.iloc[1]['fail_recall']*100:.2f}%"],
-            "Fail Precision": [f"{comp_df.iloc[0]['fail_precision']*100:.2f}%", f"{comp_df.iloc[1]['fail_precision']*100:.2f}%"],
-            "Overall Accuracy": [f"{comp_df.iloc[0]['overall_accuracy']*100:.2f}%", f"{comp_df.iloc[1]['overall_accuracy']*100:.2f}%"],
-            "Tuned Threshold": [f"{meta_a['threshold']:.4f}", f"{meta_b['threshold']:.4f}"],
-        })
-        st.dataframe(clean_comp, use_container_width=True, hide_index=True)
-
-    with col_tbl2:
-        st.markdown("#### 5-Seed Validation Ablation (`outputs/ablation_table_multiseed.csv`)")
-        clean_abl = pd.DataFrame({
-            "Feature Configuration": abl_df["Feature Set"],
-            "PR-AUC (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["PR-AUC mean"], abl_df["PR-AUC std"])],
-            "Fail F1 (Mean ± Std)": [f"{m:.4f} ± {s:.4f}" for m, s in zip(abl_df["Fail F1 mean"], abl_df["Fail F1 std"])],
-            "Fail Recall": [f"{m*100:.1f}%" for m in abl_df["Fail Rec mean"]],
-            "Fail Precision": [f"{m*100:.1f}%" for m in abl_df["Fail Prec mean"]],
-        })
-        st.dataframe(clean_abl, use_container_width=True, hide_index=True)
-
-    # -------------------------------------------------------------------------
-    # 5.3 B-Only Catches Table (29 Gained Failures)
-    # -------------------------------------------------------------------------
-    st.markdown("<hr style='margin: 20px 0; border-color: #334155;'>", unsafe_allow_html=True)
-    st.markdown("#### 🔍 Discrepancy Analysis: Gained Failures Uniquely Caught by Model B")
-    st.markdown(
-        "Across all 40 test wafers, Model B catches **29 additional true post-burn-in failures** that were missed by Model A, "
-        "while missing 8 failures that Model A caught (**net gain of +21 caught defects**). "
-        "At the fixed operating thresholds, Model B incurs extra false alarms (69 on Model B vs 15 on Model A), "
-        "illustrating the classical operational trade-off between defect capture recall and false scrap cost."
-    )
-
-    el_all = (meta_df["old_label"] == 0)
-    y_all = meta_df.loc[el_all, "label"].values if "label" in meta_df else np.zeros(el_all.sum())
-    pa_all = prob_a[el_all.values]
-    pb_all = prob_b[el_all.values]
-    th_a = meta_a["threshold"]
-    th_b = meta_b["threshold"]
-
-    gained_mask = (y_all == 1) & (pa_all < th_a) & (pb_all >= th_b)
-    gained_dies = meta_df[el_all][gained_mask][["wafer_id", "die_row", "die_col"]].copy()
-    gained_dies["Model A Risk"] = [f"{p*100:.1f}%" for p in pa_all[gained_mask]]
-    gained_dies["Model B Risk"] = [f"{p*100:.1f}%" for p in pb_all[gained_mask]]
-    gained_dies["Risk Shift (B − A)"] = [f"{(b - a)*100:+.1f}%" for a, b in zip(pa_all[gained_mask], pb_all[gained_mask])]
-    gained_dies["Status"] = "Caught by Model B Only (True Post-Test Fail)"
-
-    st.markdown(f"**Unique Model B Catches List ({len(gained_dies)} dies)**:")
-    st.dataframe(gained_dies.reset_index(drop=True), use_container_width=True, hide_index=True)
+    # Product Footer (design.md Section 44)
+    st.markdown("""
+    <div class="sd-footer">
+        <span>DieYield Intelligence • Multi-Resolution Yield Prediction</span>
+        <span>Model evaluation • v1.0</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":

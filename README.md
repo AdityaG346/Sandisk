@@ -20,6 +20,8 @@ This repository contains a complete, production-ready machine learning solution 
 - **Statistically Meaningful PR-AUC Gain**: Test set, 40 held-out wafers, wafer-cluster bootstrap (1000 iterations): PR-AUC B-A **+0.034 [+0.023, +0.043]** (95% CI strictly excludes zero). Ablation = 5 repeated wafer splits (validation).
 - **Fail F1 Not Distinguishable from Zero**: At the discrete binary decision threshold, wafer-cluster bootstrap Fail F1 B-A **+0.001 [-0.008, +0.012]** (95% CI contains zero) because 65% of new failures are marginal defects whose sub-die electrical signals overlap heavily with passing dies.
 - **Block Feature Attribution & Full Audit**: Sub-die block readings contribute **5.19%** of total TreeSHAP attribution mass (led by `blk_mean` at 0.3806), explaining why block data enhances risk ranking even with subtle signal. For comprehensive audit details, see [outputs/results_summary.md](outputs/results_summary.md).
+- **Probability Calibration & Reliability**: Platt scaling fit strictly on validation dies (`old_label=0`) cuts 10-bin quantile Expected Calibration Error (ECE) on the 40 held-out test wafers from **0.0336 → 0.0084 (-74.9%)** for Model A and **0.0293 → 0.0085 (-71.0%)** for Model B, while strictly preserving rank ordering, PR-AUC, and triage capture rates.
+- **Operational Screening Triage (10% Inspection Budget)**: At the same 10% inspection budget (3,260 dies screened), Model B captures **66 more failures** than Model A (834 vs. 768 failures, or 60.4% vs. 55.7% of all 1,380 true defects), demonstrating substantial factory screening efficiency without increasing the inspection budget.
 
 ---
 
