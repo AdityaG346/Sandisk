@@ -40,7 +40,7 @@ import streamlit as st
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="DieYield Intelligence | Multi-Resolution Yield Prediction",
-    page_icon="🔬",
+    page_icon=":material/biotech:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -246,6 +246,8 @@ st.markdown("""
     }
 
     /* Executive Results KPI Cards - Equal Height and Alignment */
+    /* Use min-height on the row instead of 100% height on inner wrappers
+       to avoid creating stacking contexts that fight the Streamlit dropdown portal */
     div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) {
         align-items: stretch !important;
     }
@@ -253,29 +255,59 @@ st.markdown("""
         display: flex !important;
         flex-direction: column !important;
     }
-    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="column"] > div {
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1 1 auto !important;
-        height: 100% !important;
-    }
     div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stVerticalBlock"] {
         display: flex !important;
         flex-direction: column !important;
         flex: 1 1 auto !important;
-        height: 100% !important;
     }
     div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stMarkdown"] {
         display: flex !important;
         flex-direction: column !important;
         flex: 1 1 auto !important;
-        height: 100% !important;
     }
     div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stMarkdownContainer"] {
         display: flex !important;
         flex-direction: column !important;
         flex: 1 1 auto !important;
-        height: 100% !important;
+    }
+
+    /* Selectbox dropdown portal — must NOT override position (JS sets it via Floating UI).
+       Only set z-index so the portal floats above all page content. */
+    div[data-baseweb="popover"] {
+        z-index: 9999 !important;
+    }
+
+    /* Constrain the dropdown list height so it never bleeds past the viewport.
+       All options remain accessible via scrolling inside the list. */
+    ul[data-testid="stSelectboxVirtualDropdown"] {
+        max-height: min(320px, 40vh) !important;
+        overflow-y: auto !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: #30353D #0D0F12 !important;
+    }
+
+    ul[data-testid="stSelectboxVirtualDropdown"]::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ul[data-testid="stSelectboxVirtualDropdown"]::-webkit-scrollbar-track {
+        background: #0D0F12;
+        border-radius: 3px;
+    }
+
+    ul[data-testid="stSelectboxVirtualDropdown"]::-webkit-scrollbar-thumb {
+        background: #30353D;
+        border-radius: 3px;
+    }
+
+    ul[data-testid="stSelectboxVirtualDropdown"]::-webkit-scrollbar-thumb:hover {
+        background: #424954;
+    }
+
+    /* Ensure Streamlit column containers don't clip the portal */
+    section[data-testid="stSidebar"] ~ div [data-testid="stVerticalBlock"],
+    [data-testid="stAppViewContainer"] [data-testid="stVerticalBlock"] {
+        overflow: visible !important;
     }
 
     .sd-exec-card {
@@ -1364,7 +1396,8 @@ def main():
             unsafe_allow_html=True,
         )
 
-    st.caption("📌 **Note on Binary Decision Boundary (F1)**: Fail F1 is essentially unchanged (Model A: 0.5207 → Model B: 0.5222, Δ +0.0015; 95% bootstrap CI [−0.008, +0.012] contains zero). Model B's primary value is in continuous probability ranking and screening efficiency: at the same 10% inspection budget, Model B captures 66 more failures than Model A (834 vs. 768 failures, or 60.4% vs. 55.7%), without increasing the inspection budget.")
+    st.markdown('<div style="margin-top: 24px;"></div>', unsafe_allow_html=True)
+    st.caption(":material/push_pin: **Note on Binary Decision Boundary (F1)**: Fail F1 is essentially unchanged (Model A: 0.5207 → Model B: 0.5222, Δ +0.0015; 95% bootstrap CI [−0.008, +0.012] contains zero). Model B's primary value is in continuous probability ranking and screening efficiency: at the same 10% inspection budget, Model B captures 66 more failures than Model A (834 vs. 768 failures, or 60.4% vs. 55.7%), without increasing the inspection budget.")
 
     # -------------------------------------------------------------------------
     # SECTION 2: Model A vs Model B Architecture & Benchmark (design.md Section 17)
@@ -1470,7 +1503,7 @@ def main():
         '<span style="display:inline-block;width:8px;height:8px;background-color:#F51B0B;border-radius:1px;"></span>'
         'Holdout Test Set Performance'
         '</div>'
-        '<span class="sd-perf-card-tag">outputs/comparison_table.csv</span>'
+        '<span class="sd-perf-card-tag">Holdout Evaluation · 40 Wafers</span>'
         '</div>'
         '<div class="sd-perf-card-subtitle">'
         'Rigorous holdout evaluation on 39,351 unseen dies across 40 holdout wafers at tuned thresholds.'
@@ -1530,7 +1563,7 @@ def main():
         '<span style="display:inline-block;width:8px;height:8px;background-color:#A855F7;border-radius:1px;"></span>'
         '5-Seed Validation Ablation'
         '</div>'
-        '<span class="sd-perf-card-tag">outputs/ablation_table_multiseed.csv</span>'
+        '<span class="sd-perf-card-tag">5-Seed Cross-Validation · 25 Folds</span>'
         '</div>'
         '<div class="sd-perf-card-subtitle">'
         'Stratified cross-validation across 5 random seeds (25 folds per configuration) measuring signal progression.'
@@ -1829,6 +1862,10 @@ def main():
         with col_s3:
             st.markdown(f"**Shift (B − A)**: `{diff_pct:+.1f}%` ({'Both Agree' if dec_a == dec_b else 'Decision Diverges'})")
 
+    # Spacer gives the die-selector dropdown clearance when open,
+    # so it does not visually intersect the next section.
+    st.markdown('<div style="padding-bottom: 200px; margin-bottom: -200px;"></div>', unsafe_allow_html=True)
+
     # -------------------------------------------------------------------------
     # SECTION 5: Hero Demo — Why Did Model B Change Its Mind? (design.md Section 19)
     # -------------------------------------------------------------------------
@@ -1918,7 +1955,7 @@ def main():
     gained_dies["Risk Shift (B − A)"] = [f"{(b - a)*100:+.1f}%" for a, b in zip(pa_all[gained_mask], pb_all[gained_mask])]
     gained_dies["Status"] = "Caught by Model B Only (True Post-Test Fail)"
 
-    st.markdown(f"#### 🔍 Complete Discrepancy Table: 29 True Failures Caught by Model B Only")
+    st.markdown(f"#### :material/search: Complete Discrepancy Table: 29 True Failures Caught by Model B Only")
     st.dataframe(gained_dies.reset_index(drop=True), use_container_width=True, hide_index=True)
 
     # -------------------------------------------------------------------------
@@ -1998,7 +2035,7 @@ def main():
         plt.close(fig_bar)
 
     with col_shap2:
-        st.markdown("#### Domain Attribution Breakdown (design.md Section 22)")
+        st.markdown("#### Domain Attribution Breakdown")
         
         # Domain contributions
         die_contrib = float(sum(abs(die_shap[i]) for i, f in enumerate(feat_cols) if f.startswith("feature_")))
@@ -2080,7 +2117,7 @@ def main():
             - **Live Sensitivity Test**: Normalizing top non-spatial driver `{top_driver}` from `{die_X[top_driver]:.3g}` to healthy median `{active_pass_med[top_driver]:.3g}` shifts failure probability from **{sel_prob*100:.1f}%** to **{p_cf*100:.1f}%** (Δ = {delta_p*100:+.1f}%).
             """)
 
-    st.caption("⚠️ **Disclaimer**: Model-based mathematical sensitivity estimate; not a physical semiconductor manufacturing simulation or causal intervention.")
+    st.caption(":material/warning: **Disclaimer**: Model-based mathematical sensitivity estimate; not a physical semiconductor manufacturing simulation or causal intervention.")
 
     # Sub-Die Block View (Model B Only, design.md Section 24 & 25)
     if active_is_model_b:
@@ -2102,7 +2139,7 @@ def main():
             plt.close(fig_strip)
             
             st.caption(
-                "📌 **Physical Mapping & Threshold Notice**: Anomalous points are highlighted using the robust MAD threshold from `src/block_features.py` (|reading - median| > 2.0 × MAD). "
+                ":material/push_pin: **Physical Mapping & Threshold Notice**: Anomalous points are highlighted using the robust MAD threshold from `src/block_features.py` (|reading - median| > 2.0 × MAD). "
                 "The X-axis indicates sequential index position within the stream (0..1999) — NOT genuine physical 2D/3D spatial coordinates within the die stack."
             )
             st.markdown("""
