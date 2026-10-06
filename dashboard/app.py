@@ -236,7 +236,7 @@ st.markdown("""
         background-color: var(--sd-surface-2);
         border: 1px solid var(--sd-border);
         border-radius: var(--radius-md);
-        padding: 20px 22px;
+        padding: 16px 18px;
         transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease;
     }
 
@@ -245,13 +245,80 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* Dominant Hero KPI Card (+66) */
+    /* Executive Results KPI Cards - Equal Height and Alignment */
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) {
+        align-items: stretch !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="column"] {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="column"] > div {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        height: 100% !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stVerticalBlock"] {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        height: 100% !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stMarkdown"] {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        height: 100% !important;
+    }
+    div[data-testid="stHorizontalBlock"]:has(.sd-exec-card) [data-testid="stMarkdownContainer"] {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        height: 100% !important;
+    }
+
+    .sd-exec-card {
+        background-color: var(--sd-surface-2);
+        border: 1px solid var(--sd-border);
+        border-top: 3px solid transparent;
+        border-radius: var(--radius-md);
+        padding: 12px 14px 10px 14px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+        min-height: 136px;
+        width: 100%;
+        transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease;
+    }
+
+    .sd-exec-card:hover {
+        border-color: #424954;
+        transform: translateY(-1px);
+    }
+
+    /* 10% Inspection Budget (Hero) - Highlighted, same height */
+    .sd-exec-card-hero {
+        background: linear-gradient(180deg, #1a1e26 0%, var(--sd-surface-2) 100%);
+        border: 1px solid var(--sd-border);
+        border-top: 3px solid var(--sd-red);
+        box-shadow: 0 4px 20px rgba(245, 27, 11, 0.08);
+    }
+
+    .sd-exec-card-hero:hover {
+        border-color: #4d5563;
+        border-top-color: var(--sd-red);
+        transform: translateY(-1px);
+    }
+
     .sd-card-hero {
         background: linear-gradient(180deg, #1a1e26 0%, var(--sd-surface-2) 100%);
         border: 1px solid var(--sd-border);
         border-top: 3px solid var(--sd-red);
         border-radius: var(--radius-md);
-        padding: 20px 22px;
+        padding: 16px 18px;
         box-shadow: 0 4px 20px rgba(245, 27, 11, 0.08);
         transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease;
     }
@@ -262,53 +329,69 @@ st.markdown("""
     }
 
     .sd-kpi-label {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.06em;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
         text-transform: uppercase;
         color: var(--sd-text-secondary);
-        margin-bottom: 6px;
+        margin-bottom: 2px;
+        line-height: 1.2;
     }
 
     .sd-kpi-value {
-        font-size: 2.1rem;
+        font-size: 1.45rem;
         font-weight: 800;
         letter-spacing: -0.02em;
         color: var(--sd-white);
-        line-height: 1.1;
-        margin-bottom: 4px;
+        line-height: 1.15;
+        margin-bottom: 2px;
         font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
     }
 
     .sd-kpi-value-hero {
-        font-size: 2.2rem;
+        font-size: 1.45rem;
         font-weight: 800;
         letter-spacing: -0.02em;
         color: var(--sd-white);
-        line-height: 1.1;
-        margin-bottom: 4px;
+        line-height: 1.15;
+        margin-bottom: 2px;
+        font-family: 'Inter', sans-serif;
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+    }
+
+    .sd-kpi-sub-val {
+        font-size: 0.78rem;
+        color: var(--sd-text-secondary);
+        font-weight: 500;
     }
 
     .sd-kpi-delta {
-        font-size: 0.85rem;
+        font-size: 0.72rem;
         font-weight: 700;
         color: var(--sd-success);
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
+        line-height: 1.2;
     }
 
     .sd-kpi-delta-red {
-        font-size: 0.85rem;
+        font-size: 0.72rem;
         font-weight: 700;
         color: var(--sd-red);
+        line-height: 1.2;
     }
 
     .sd-kpi-sub {
-        font-size: 0.75rem;
+        font-size: 0.65rem;
         color: var(--sd-text-muted);
-        margin-top: 4px;
-        line-height: 1.35;
+        margin-top: 2px;
+        line-height: 1.22;
     }
 
     /* Section Headers */
@@ -1226,43 +1309,59 @@ def main():
     col_ex1, col_ex2, col_ex3, col_ex4 = st.columns(4)
     with col_ex1:
         st.markdown(
-            '<div class="sd-card">'
+            '<div class="sd-exec-card">'
+            '<div>'
             '<div class="sd-kpi-label">PR-AUC (Continuous Ranking)</div>'
             '<div class="sd-kpi-value">0.5362</div>'
+            '</div>'
+            '<div>'
             '<div class="sd-kpi-delta">Δ +0.0337 (+6.7% vs A: 0.5025)</div>'
             '<div class="sd-kpi-sub">95% wafer-cluster bootstrap CI [+0.023, +0.043]</div>'
+            '</div>'
             '</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     with col_ex2:
         st.markdown(
-            '<div class="sd-card-hero">'
+            '<div class="sd-exec-card sd-exec-card-hero">'
+            '<div>'
             '<div class="sd-kpi-label" style="color: var(--sd-red);">10% Inspection Budget (Hero)</div>'
-            '<div class="sd-kpi-value-hero">834 <span style="font-size: 1.2rem; color: var(--sd-text-secondary); font-weight: 500;">vs 768 fails</span></div>'
+            '<div class="sd-kpi-value-hero">834 <span class="sd-kpi-sub-val">vs 768 fails</span></div>'
+            '</div>'
+            '<div>'
             '<div class="sd-kpi-delta-red">+66 Additional Failures Captured</div>'
             '<div class="sd-kpi-sub">60.4% vs 55.7% failure capture · 3,260 dies screened</div>'
+            '</div>'
             '</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     with col_ex3:
         st.markdown(
-            '<div class="sd-card">'
+            '<div class="sd-exec-card">'
+            '<div>'
             '<div class="sd-kpi-label">Test Population</div>'
             '<div class="sd-kpi-value">32,598</div>'
+            '</div>'
+            '<div>'
             '<div class="sd-kpi-delta" style="color: var(--sd-text-secondary);">1,380 New Failures (4.23%)</div>'
             '<div class="sd-kpi-sub">40 Held-Out Production Wafers</div>'
+            '</div>'
             '</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
     with col_ex4:
         st.markdown(
-            '<div class="sd-card">'
+            '<div class="sd-exec-card">'
+            '<div>'
             '<div class="sd-kpi-label">Model Resolution</div>'
-            '<div class="sd-kpi-value">531 <span style="font-size: 1.2rem; color: var(--sd-text-secondary); font-weight: 500;">Feats</span></div>'
+            '<div class="sd-kpi-value">531 <span class="sd-kpi-sub-val">Feats</span></div>'
+            '</div>'
+            '<div>'
             '<div class="sd-kpi-delta" style="color: var(--sd-model-b);">Model B (+20 Sub-Die Feats)</div>'
             '<div class="sd-kpi-sub">Model A: 511 features (Baseline)</div>'
+            '</div>'
             '</div>',
-            unsafe_allow_html=True
+            unsafe_allow_html=True,
         )
 
     st.caption("📌 **Note on Binary Decision Boundary (F1)**: Fail F1 is essentially unchanged (Model A: 0.5207 → Model B: 0.5222, Δ +0.0015; 95% bootstrap CI [−0.008, +0.012] contains zero). Model B's primary value is in continuous probability ranking and screening efficiency: at the same 10% inspection budget, Model B captures 66 more failures than Model A (834 vs. 768 failures, or 60.4% vs. 55.7%), without increasing the inspection budget.")
